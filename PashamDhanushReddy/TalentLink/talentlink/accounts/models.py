@@ -1,0 +1,30 @@
+from django.db import models
+from django.conf import settings
+from django.contrib.auth.models import AbstractUser
+
+class User(AbstractUser):
+    ROLE_CLIENT = 'client'
+    ROLE_FREELANCER = 'freelancer'
+    ROLE_CHOICES = [
+        (ROLE_CLIENT, 'Client'),
+        (ROLE_FREELANCER, 'Freelancer'),
+    ]
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+
+class Skill(models.Model):
+    skill_name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.skill_name
+
+class Profile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
+    name = models.CharField(max_length=150)
+    bio = models.TextField(blank=True)
+    hourly_rate = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    experience = models.PositiveIntegerField(null=True, blank=True)
+    portfolio = models.TextField(blank=True)
+    skills = models.ManyToManyField(Skill, related_name='profiles', blank=True)
+
+    def __str__(self):
+        return self.name

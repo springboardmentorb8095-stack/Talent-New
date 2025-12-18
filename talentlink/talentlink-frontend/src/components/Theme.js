@@ -1,32 +1,4 @@
-// import { createTheme, ThemeProvider } from "@mui/material/styles";
-// import CssBaseline from "@mui/material/CssBaseline";
-// import { deepPurple, amber } from "@mui/material/colors";
 
-// const theme = createTheme({
-//   palette: {
-//     mode: "light",
-//     primary: { main: deepPurple[500] },
-//     secondary: { main: amber[500] },
-//     background: { default: "#f5f5f5", paper: "#ffffff" },
-//   },
-//   typography: {
-//     fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
-//     button: { textTransform: "none" },
-//   },
-//   components: {
-//     MuiButton: { styleOverrides: { root: { borderRadius: 8 } } },
-//     MuiTextField: { styleOverrides: { root: { marginBottom: 16 } } },
-//   },
-// });
-
-// export default function Theme({ children }) {
-//   return (
-//     <ThemeProvider theme={theme}>
-//       <CssBaseline />
-//       {children}
-//     </ThemeProvider>
-//   );
-// }
 import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({

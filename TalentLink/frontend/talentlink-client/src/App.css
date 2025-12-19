@@ -1,0 +1,133 @@
+body {
+  margin: 0;
+  background-color: #171d33;
+  font-family: Arial, sans-serif;
+}
+
+.auth-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth-card {
+  background: #020617;
+  width: 380px;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0px 15px 40px rgba(0, 0, 0, 0.8);
+  color: white;
+  text-align: center;
+}
+
+/* INPUT FIELD */
+.auth-card input {
+  width: 92%;
+  padding: 12px;
+  margin-bottom: 14px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  outline: none;
+  background: #020617;
+  color: white;
+  box-shadow: inset 0px 0px 6px rgba(255, 255, 255, 0.15);
+  transition: all 0.2s ease;
+}
+
+/* WHITE BORDER ON HOVER & FOCUS */
+.auth-card input:hover,
+.auth-card input:focus {
+  border: 1px solid white;
+  box-shadow: 0px 0px 8px rgba(255, 255, 255, 0.6);
+}
+
+/* PASSWORD FIELD WRAPPER */
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  width: 92%;
+  border-radius: 6px;
+  background: #0f172a;
+  border: 1px solid transparent;
+  outline: none;
+  background: #020617;
+  /* border: 1px solid #1e293b; */
+  color: white;
+}
+
+.password-wrapper input:focus {
+  outline: none;
+  border: 1px solid white;
+}
+
+/* .eye-icon {
+  position: absolute;
+  right: 15px;
+  top: 42%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #cbd5f5;
+  font-size: 18px;
+} */
+ .eye-icon {
+  position: absolute;
+  right: 14px;
+  top: 40%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #cbd5f5;
+  font-size: 18px;
+}
+
+
+
+/* BUTTON */
+.auth-card button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0px 5px 15px rgba(37, 99, 235, 0.5);
+}
+
+.auth-card button:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 6px 20px rgba(37, 99, 235, 0.5);
+}
+
+.link {
+  color: #60a5fa;
+  cursor: pointer;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.success {
+  color: #22c55e;
+  font-weight: bolder;
+}
+
+.error {
+  color: #ef4444;
+  font-weight: bolder;
+}
+
+.auth-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.auth-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0px 20px 50px rgba(0, 0, 0, 0.9);
+}

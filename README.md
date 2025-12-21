@@ -1,6 +1,6 @@
 # Talent-Link: Freelance Marketplace (Batch-1 Internship)
 Name : Khushi Soni
-Batch : 1
+, Batch : 1
 
 ## 📌 Project Overview
 Talent-Link is a full-stack platform designed to connect skilled freelancers with clients. This repository tracks the progress of the Batch-1 internship, focusing on building a scalable MERN/Django-based architecture to manage job postings, proposals, and secure user interactions.

@@ -1,3 +1,4 @@
+
 # from pathlib import Path
 # from datetime import timedelta
 
@@ -18,6 +19,7 @@
 #     'django.contrib.sessions',
 #     'django.contrib.messages',
 #     'django.contrib.staticfiles',
+#     'django_extensions',
 
 #     # Third-party
 #     'rest_framework',
@@ -25,13 +27,15 @@
 #     'rest_framework_simplejwt',
 
 #     # Local apps
-#     'users',
-#     'projects',
-#     'skills',
-#     'proposals',
-#     'contracts',
-#     'messages_app',
-#     'reviews',
+#     # Local apps
+# 'skills',        # MUST come first
+# 'users',
+# 'projects',
+# 'proposals',
+# 'contracts',
+# 'messages_app',
+# 'reviews',
+
 # ]
 
 # # =====================
@@ -42,7 +46,6 @@
 #     'django.middleware.security.SecurityMiddleware',
 #     'django.contrib.sessions.middleware.SessionMiddleware',
 #     'django.middleware.common.CommonMiddleware',
-#     'django.middleware.csrf.CsrfViewMiddleware',
 #     'django.contrib.auth.middleware.AuthenticationMiddleware',
 #     'django.contrib.messages.middleware.MessageMiddleware',
 #     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -88,7 +91,7 @@
 # AUTH_USER_MODEL = "users.User"
 
 # # =====================
-# # CORS (React → Django)
+# # ✅ CORS (FIXED)
 # # =====================
 # CORS_ALLOWED_ORIGINS = [
 #     "http://localhost:3000",
@@ -96,6 +99,16 @@
 # ]
 
 # CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOW_ALL_HEADERS = True
+
+# CORS_ALLOW_METHODS = [
+#     "DELETE",
+#     "GET",
+#     "OPTIONS",
+#     "PATCH",
+#     "POST",
+#     "PUT",
+# ]
 
 # # =====================
 # # REST + JWT
@@ -104,6 +117,12 @@
 #     "DEFAULT_AUTHENTICATION_CLASSES": (
 #         "rest_framework_simplejwt.authentication.JWTAuthentication",
 #     ),
+#     "DEFAULT_PERMISSION_CLASSES": (
+#         "rest_framework.permissions.AllowAny",
+#     ),
+#     "DEFAULT_FILTER_BACKENDS": (
+#         "django_filters.rest_framework.DjangoFilterBackend",
+#     ),
 # }
 
 # SIMPLE_JWT = {
@@ -111,26 +130,35 @@
 #     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 # }
 
+
 # # =====================
 # # STATIC
 # # =====================
 # STATIC_URL = 'static/'
 
 # DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 from pathlib import Path
 from datetime import timedelta
 
+# =====================
+# BASE DIR
+# =====================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# =====================
+# SECURITY
+# =====================
 SECRET_KEY = 'django-insecure-change-this-in-production'
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]  # Dev only
+ALLOWED_HOSTS = ["*"]  # Development only
 
 # =====================
 # INSTALLED APPS
 # =====================
 INSTALLED_APPS = [
+    # Django core
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -142,11 +170,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'rest_framework_simplejwt',
+    'django_extensions',
+    'django_filters',
 
-    # Local apps
+    # Local apps (ORDER MATTERS)
+    'skills',
     'users',
     'projects',
-    'skills',
     'proposals',
     'contracts',
     'messages_app',
@@ -161,11 +191,15 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# =====================
+# URL CONFIG
+# =====================
 ROOT_URLCONF = 'talentlink.urls'
 
 # =====================
@@ -187,6 +221,9 @@ TEMPLATES = [
     },
 ]
 
+# =====================
+# WSGI
+# =====================
 WSGI_APPLICATION = 'talentlink.wsgi.application'
 
 # =====================
@@ -203,10 +240,61 @@ DATABASES = {
     }
 }
 
-AUTH_USER_MODEL = "users.User"
+# =====================
+# CUSTOM USER MODEL
+# =====================
+AUTH_USER_MODEL = 'users.User'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # =====================
-# ✅ CORS (FIXED)
+# PASSWORD VALIDATION
+# =====================
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+
+# =====================
+# REST FRAMEWORK
+# =====================
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+    ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
+}
+
+# =====================
+# SIMPLE JWT
+# =====================
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+}
+
+# =====================
+# CORS
 # =====================
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -226,26 +314,19 @@ CORS_ALLOW_METHODS = [
 ]
 
 # =====================
-# REST + JWT
+# INTERNATIONALIZATION
 # =====================
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
-    "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.AllowAny",
-    ),
-}
-
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-}
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_TZ = True
 
 # =====================
-# STATIC
+# STATIC FILES
 # =====================
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
+# =====================
+# DEFAULT PRIMARY KEY
+# =====================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-

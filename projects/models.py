@@ -7,6 +7,7 @@ class Project(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     budget = models.DecimalField(max_digits=10, decimal_places=2)
+    duration = models.IntegerField(default=30,  help_text="Duration in days")
     skills_required = models.ManyToManyField(Skill)
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -1,26 +1,22 @@
-"""
-URL configuration for talentlink project.
-
-The `urlpatterns` list routes URLs to views.
-"""
-
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework_simplejwt.views import TokenRefreshView  # Token Refresh API
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+print("🔥 USING talentlink/urls.py 🔥")
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # User Authentication Routes
+    # Users API
     path('api/users/', include('users.urls')),
 
-    # Profile CRUD Routes (Protected)
+    # Profile API
     path('api/profile/', include('users.profile_urls')),
 
-    # Token Refresh Route
+    # JWT Token endpoints
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    # Projects API
+    path('api/projects/', include('projects.urls')),
 ]
-
-
-
-

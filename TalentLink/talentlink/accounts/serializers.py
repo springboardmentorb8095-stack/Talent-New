@@ -33,10 +33,10 @@ class ProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Profile
-        fields = ['id', 'user', 'name', 'bio', 'hourly_rate', 'experience', 'portfolio', 'skills']
-        read_only_fields = ['id']
+        fields = ['id', 'user', 'name', 'bio', 'hourly_rate', 'experience', 'portfolio', 'skills', 'availability', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ['name', 'bio', 'hourly_rate', 'experience', 'portfolio', 'skills']
+        fields = ['name', 'bio', 'hourly_rate', 'experience', 'portfolio', 'skills', 'availability']

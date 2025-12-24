@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 
 class User(AbstractUser):
     ROLE_CLIENT = 'client'
@@ -18,6 +19,15 @@ class Skill(models.Model):
         return self.skill_name
 
 class Profile(models.Model):
+    AVAILABILITY_AVAILABLE = 'available'
+    AVAILABILITY_BUSY = 'busy'
+    AVAILABILITY_UNAVAILABLE = 'unavailable'
+    AVAILABILITY_CHOICES = [
+        (AVAILABILITY_AVAILABLE, 'Available'),
+        (AVAILABILITY_BUSY, 'Busy'),
+        (AVAILABILITY_UNAVAILABLE, 'Unavailable'),
+    ]
+
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
     name = models.CharField(max_length=150)
     bio = models.TextField(blank=True)
@@ -25,6 +35,9 @@ class Profile(models.Model):
     experience = models.PositiveIntegerField(null=True, blank=True)
     portfolio = models.TextField(blank=True)
     skills = models.ManyToManyField(Skill, related_name='profiles', blank=True)
+    availability = models.CharField(max_length=20, choices=AVAILABILITY_CHOICES, default=AVAILABILITY_AVAILABLE)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name

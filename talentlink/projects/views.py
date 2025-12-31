@@ -11,12 +11,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all().order_by('-created_at')
     serializer_class = ProjectSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-    
+    permission_classes = [IsAuthenticated]
+
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['duration']
     search_fields = ['budget', 'skills','duration']
     ordering_fields = ['budget', 'created_at']
     ordering = ['-created_at']
+
 
     def get_queryset(self):
         queryset = super().get_queryset()

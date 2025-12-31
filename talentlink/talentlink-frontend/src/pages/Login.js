@@ -1,5 +1,4 @@
 
-
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -37,6 +36,15 @@ const Login = () => {
     }
   };
 
+  // Dark mode TextField styles
+  const darkTextFieldStyles = {
+    '& .MuiInputBase-input': { color: '#EAF6F7' },
+    '& .MuiOutlinedInput-notchedOutline': { borderColor: '#5E9FA6' },
+    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#A0C4C9' },
+    '& .MuiInputLabel-root': { color: '#A0C4C9' },
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  };
+
   return (
     <Box
       sx={{
@@ -67,6 +75,7 @@ const Login = () => {
               margin="normal"
               required
               autoFocus
+              sx={darkTextFieldStyles}
             />
             <TextField
               label="Password"
@@ -77,6 +86,7 @@ const Login = () => {
               fullWidth
               margin="normal"
               required
+              sx={darkTextFieldStyles}
             />
 
             <Button
@@ -95,7 +105,7 @@ const Login = () => {
               onClick={() => navigate('/register')}
               sx={{ display: 'block', color: '#AEE5EA' }}
             >
-             NO ACCOUNT? REGISTER HERE
+              NO ACCOUNT? REGISTER HERE
             </Link>
           </Box>
         </Paper>

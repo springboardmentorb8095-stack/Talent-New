@@ -50,6 +50,23 @@ const Register = () => {
     }
   };
 
+  // Dark mode styles for TextField and Select
+  const darkInputStyles = {
+    '& .MuiInputBase-input': { color: '#EAF6F7' },
+    '& .MuiOutlinedInput-notchedOutline': { borderColor: '#5E9FA6' },
+    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#A0C4C9' },
+    '& .MuiInputLabel-root': { color: '#A0C4C9' },
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  };
+
+  const darkSelectStyles = {
+    '& .MuiSelect-select': { color: '#EAF6F7' },
+    '& .MuiOutlinedInput-notchedOutline': { borderColor: '#5E9FA6' },
+    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#A0C4C9' },
+    '& .MuiInputLabel-root': { color: '#A0C4C9' },
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  };
+
   return (
     <Box
       sx={{
@@ -75,6 +92,7 @@ const Register = () => {
               value={formData.username}
               onChange={handleChange}
               required
+              sx={darkInputStyles}
             />
 
             <TextField
@@ -86,6 +104,7 @@ const Register = () => {
               value={formData.email}
               onChange={handleChange}
               required
+              sx={darkInputStyles}
             />
 
             <TextField
@@ -97,9 +116,10 @@ const Register = () => {
               value={formData.password}
               onChange={handleChange}
               required
+              sx={darkInputStyles}
             />
 
-            <FormControl fullWidth margin="normal">
+            <FormControl fullWidth margin="normal" sx={darkSelectStyles}>
               <InputLabel>Role</InputLabel>
               <Select
                 name="role"

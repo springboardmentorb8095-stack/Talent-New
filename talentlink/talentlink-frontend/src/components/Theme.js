@@ -1,12 +1,10 @@
 
-
-// export default theme; 
 import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#2F6F78',     // Main teal (LOGIN button)
+      main: '#2F6F78',     
       light: '#5E9FA6',
       dark: '#0F2E35',
       contrastText: '#ffffff',
@@ -15,8 +13,8 @@ const theme = createTheme({
       main: '#5E9FA6',
     },
     background: {
-      default: '#0F2E35',  // Page background
-      paper: '#0C2328',    // Cards
+      default: '#0F2E35',  
+      paper: '#0C2328',    
     },
     text: {
       primary: '#EAF6F7',

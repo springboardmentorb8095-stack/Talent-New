@@ -153,12 +153,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
 ]
 
-# If your login uses cookies/session/auth tokens (very common)
-CORS_ALLOW_CREDENTIALS = True
-# Temporary fix for development to allow all CORS (safe for localhost)
+
+#CORS_ALLOW_CREDENTIALS = True
+
 CORS_ALLOW_ALL_ORIGINS = True
 
-# Or if you want strict (recommended after it works)
 # CORS_ALLOWED_ORIGINS = [
 #     "http://localhost:3000",
 #     "http://127.0.0.1:3000",

@@ -9,6 +9,11 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import ProjectFeed from "./pages/ProjectFeed";
+import ProjectDetail from "./pages/ProjectDetail";
+import SubmitProposal from "./pages/SubmitProposal";
+import NewProject from "./pages/NewProject";
+
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -28,6 +33,11 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/projects" element={<ProjectFeed />} />
+              <Route path="/projects/:id" element={<ProjectDetail />} />
+              <Route path="/projects/:id/apply" element={<SubmitProposal />} />
+              <Route path="/project-feed" element={<ProjectFeed />} />
+              <Route path="/projects/new" element={<NewProject />} />
             </Routes>
           </Router>
         </AuthProvider>

@@ -21,3 +21,8 @@ WEEK 3:
 1. Implement Profile model (portfolio, skills, hourly rate, availability).
 2. Project posting endpoints: create, read, update, delete (Clients).
 3. Implement search/filter APIs (by skill, budget, duration).
+
+WEEK 4 :
+
+1. Proposal model & endpoints: freelancers submit proposals; clients view/manage proposals.
+2. Basic frontend pages: project feed, project details, proposal submission form.

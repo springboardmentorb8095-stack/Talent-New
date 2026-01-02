@@ -17,11 +17,11 @@ import {
   IconButton,
   Avatar,
 } from "@mui/material";
-import { Add, ArrowBack, Logout } from "@mui/icons-material";
+import { Add, ArrowBack } from "@mui/icons-material";
 
 const NewProject = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, } = useAuth();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -140,9 +140,7 @@ const NewProject = () => {
                 Client
               </Typography>
             </Box>
-            <IconButton color="inherit" onClick={logout}>
-              <Logout />
-            </IconButton>
+            {/* Logout button removed */}
           </Box>
         </Toolbar>
       </AppBar>

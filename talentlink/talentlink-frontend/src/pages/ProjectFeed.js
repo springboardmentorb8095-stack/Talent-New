@@ -16,10 +16,10 @@ import {
   Avatar,
   IconButton,
 } from "@mui/material";
-import { Logout, ArrowBack } from "@mui/icons-material";
+import { ArrowBack } from "@mui/icons-material";
 
 function ProjectFeed() {
-  const { user, logout } = useAuth();
+  const { user, } = useAuth();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -78,9 +78,7 @@ function ProjectFeed() {
                 Freelancer
               </Typography>
             </Box>
-            <IconButton color="inherit" onClick={logout}>
-              <Logout />
-            </IconButton>
+            {/* Logout button removed */}
           </Box>
         </Toolbar>
       </AppBar>
@@ -134,7 +132,7 @@ function ProjectFeed() {
 
                     <Button
                       component={Link}
-                      to={`/projects/${project.id}`} // Project details page where freelancer can submit proposal
+                      to={`/projects/${project.id}`}
                       variant="contained"
                       sx={{
                         backgroundColor: "#5E9FA6",

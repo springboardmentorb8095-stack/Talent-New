@@ -8,6 +8,7 @@ function Register({ setPage }) {
     email: "",
     password: "",
     confirmPassword: "",
+    role: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -21,10 +22,22 @@ function Register({ setPage }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    // 🔐 Password rules
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if (!passwordRegex.test(formData.password)) {
+      setErrorMessage(
+        "Password must be at least 8 characters, include 1 uppercase letter, 1 number, and 1 special character."
+      );
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
-      setErrorMessage("Invalid username or password");
-      setSuccessMessage("");
+      setErrorMessage("Passwords do not match.");
       return;
     }
 
@@ -33,12 +46,19 @@ function Register({ setPage }) {
         username: formData.username,
         email: formData.email,
         password: formData.password,
+        role: formData.role,
       });
-      setSuccessMessage("Register successful!");
-      setErrorMessage("");
-    } catch {
-      setErrorMessage("Invalid username or password");
-      setSuccessMessage("");
+
+      setSuccessMessage("Registration successful! Please login.");
+
+      // ⏳ redirect after short delay
+      setTimeout(() => {
+        setPage("login");
+      }, 1500);
+    } catch (err) {
+      setErrorMessage(
+        "Registration failed. Username or email may already exist."
+      );
     }
   };
 
@@ -60,6 +80,20 @@ function Register({ setPage }) {
           onChange={handleChange}
           required
         />
+
+        <select
+          name="role"
+          value={formData.role}
+          onChange={handleChange}
+          className={formData.role === "" ? "placeholder" : ""}
+          required
+        >
+          <option value="" disabled>
+            Select Your Role
+          </option>
+          <option value="client">Client</option>
+          <option value="freelancer">Freelancer</option>
+        </select>
 
         <div className="password-wrapper">
           <input
@@ -98,8 +132,8 @@ function Register({ setPage }) {
         <button type="submit">Register</button>
       </form>
 
-      <p className="success">{successMessage}</p>
-      <p className="error">{errorMessage}</p>
+      {successMessage && <p className="success">{successMessage}</p>}
+      {errorMessage && <p className="error">{errorMessage}</p>}
 
       <p className="link" onClick={() => setPage("login")}>
         Back to Login

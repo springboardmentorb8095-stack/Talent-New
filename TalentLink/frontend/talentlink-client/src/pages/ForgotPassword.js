@@ -31,16 +31,16 @@ function ForgotPassword({ setPage }) {
         }
       );
 
-      // ✅ SUCCESS CASE
+      // SUCCESS CASE
       if (res.status === 200) {
         setSuccessMessage("Password updated successfully!");
         setErrorMessage("");
 
-        // optional: redirect after 2 sec
+        //redirect after 2 sec
         setTimeout(() => setPage("login"), 2000);
       }
     } catch (err) {
-      // ❌ REAL ERROR
+      
       if (err.response && err.response.data?.error) {
         setErrorMessage(err.response.data.error);
       } else {
@@ -99,10 +99,10 @@ function ForgotPassword({ setPage }) {
         <button type="submit">Update Password</button>
       </form>
 
-      {/* ✅ GREEN SUCCESS */}
+      
       {successMessage && <p className="success">{successMessage}</p>}
 
-      {/* ❌ RED ERROR */}
+    
       {errorMessage && <p className="error">{errorMessage}</p>}
 
       <p className="link" onClick={() => setPage("login")}>

@@ -11,24 +11,31 @@ function Login({ setPage }) {
 
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post(
-        "http://127.0.0.1:8000/api/auth/login/",
-        { username, password }
-      );
+  e.preventDefault();
+  try {
+    const res = await axios.post(
+      "http://127.0.0.1:8000/api/auth/login/",
+      { username, password }
+    );
 
-      localStorage.setItem("access", res.data.access);
-      localStorage.setItem("refresh", res.data.refresh);
+    localStorage.setItem("access", res.data.access);
+    localStorage.setItem("refresh", res.data.refresh);
+    localStorage.setItem("username", username);
 
-      // setMessage("Login successful!");
-      setSuccessMessage("Login successful!");
-      setErrorMessage("");
-    } catch {
-      setErrorMessage("Invalid username or password");
-      setSuccessMessage("");
-    }
-  };
+
+    setSuccessMessage("Login successful!");
+    setErrorMessage("");
+
+    setTimeout(() => {
+      setPage("projects");
+    }, 500);
+
+  } catch {
+    setErrorMessage("Invalid username or password");
+    setSuccessMessage("");
+  }
+};
+
 
   return (
     <>
@@ -61,8 +68,6 @@ function Login({ setPage }) {
 
         <button type="submit">Login</button>
       </form>
-
-      {/* <p className="error">{message}</p> */}
 
       <p className="success">{successMessage}</p>
       <p className="error">{errorMessage}</p>

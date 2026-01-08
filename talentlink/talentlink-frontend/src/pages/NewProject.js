@@ -17,11 +17,11 @@ import {
   IconButton,
   Avatar,
 } from "@mui/material";
-import { Add, ArrowBack } from "@mui/icons-material";
+import { Add, ArrowBack, Logout } from "@mui/icons-material";
 
 const NewProject = () => {
   const navigate = useNavigate();
-  const { user, } = useAuth();
+  const { user, logout } = useAuth();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -109,6 +109,11 @@ const NewProject = () => {
     backgroundColor: "rgba(255,255,255,0.05)",
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <>
       <AppBar
@@ -140,7 +145,9 @@ const NewProject = () => {
                 Client
               </Typography>
             </Box>
-            {/* Logout button removed */}
+            <IconButton color="inherit" onClick={handleLogout}>
+              <Logout />
+            </IconButton>
           </Box>
         </Toolbar>
       </AppBar>

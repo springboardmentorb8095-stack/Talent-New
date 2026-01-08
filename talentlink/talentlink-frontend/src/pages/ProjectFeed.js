@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Added useNavigate
 import { useAuth } from "../context/AuthContext";
 import {
   Container,
@@ -16,10 +16,11 @@ import {
   Avatar,
   IconButton,
 } from "@mui/material";
-import { ArrowBack } from "@mui/icons-material";
+import { Logout, ArrowBack } from "@mui/icons-material";
 
 function ProjectFeed() {
-  const { user, } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate(); // <-- Added
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,6 +39,11 @@ function ProjectFeed() {
         setLoading(false);
       });
   }, []);
+
+  const handleLogout = () => {
+    logout();           // Clear auth state / token
+    navigate("/login"); // Redirect to login page
+  };
 
   return (
     <>
@@ -78,7 +84,9 @@ function ProjectFeed() {
                 Freelancer
               </Typography>
             </Box>
-            {/* Logout button removed */}
+            <IconButton color="inherit" onClick={handleLogout}>
+              <Logout />
+            </IconButton>
           </Box>
         </Toolbar>
       </AppBar>
@@ -132,7 +140,7 @@ function ProjectFeed() {
 
                     <Button
                       component={Link}
-                      to={`/projects/${project.id}`}
+                      to={`/projects/${project.id}`} // Project details page where freelancer can submit proposal
                       variant="contained"
                       sx={{
                         backgroundColor: "#5E9FA6",

@@ -48,8 +48,6 @@ INSTALLED_APPS = [
     'review',
     'message',
     'contracts',
-    
-    
 ]
 
 MIDDLEWARE = [

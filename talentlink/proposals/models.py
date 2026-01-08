@@ -26,11 +26,7 @@ class Proposal(models.Model):
     ], default='pending')
     created_at = models.DateTimeField(default=timezone.now)
 
-    #class Meta:
-        #unique_together = ('project', 'freelancer')
-        #ordering = ['-created_at']
-        #managed = False
-        #db_table = 'proposals'
+    
 
     class Meta:
         db_table = 'proposals'

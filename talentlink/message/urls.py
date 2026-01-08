@@ -1,12 +1,12 @@
 
+
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ProjectViewSet
+from .views import MessageViewSet
 
 router = DefaultRouter()
-router.register(r'projects', ProjectViewSet, basename='project')
+router.register(r'', MessageViewSet, basename='messages')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('api/contracts/', include('contracts.urls')),
 ]

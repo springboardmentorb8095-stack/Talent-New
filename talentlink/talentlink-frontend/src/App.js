@@ -13,8 +13,8 @@ import ProjectFeed from "./pages/ProjectFeed";
 import ProjectDetail from "./pages/ProjectDetail";
 import SubmitProposal from "./pages/SubmitProposal";
 import NewProject from "./pages/NewProject";
-
-
+import MessagingPage from './pages/MessagingPage';
+import ContractsPage from "./pages/ContractsPage";
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return <div>Loading...</div>;
@@ -38,6 +38,8 @@ function App() {
               <Route path="/projects/:id/apply" element={<SubmitProposal />} />
               <Route path="/project-feed" element={<ProjectFeed />} />
               <Route path="/projects/new" element={<NewProject />} />
+              <Route path="/messages/" element={<MessagingPage />} />
+              <Route path="/contracts" element={<ContractsPage />} />
             </Routes>
           </Router>
         </AuthProvider>

@@ -4,7 +4,8 @@ from .views import ProfileDetailView, ProfileListView
 
 urlpatterns = [
     path('', ProfileDetailView.as_view(), name='profile_detail'),         # GET/PATCH current user profile
-    path('list/', ProfileListView.as_view(), name='profile_list'),       # optional: all profiles
+    path('list/', ProfileListView.as_view(), name='profile_list'),   
+    path('<int:pk>/', ProfileDetailView.as_view(), name='profile_by_id'),    # optional: all profiles
     # Remove the old create endpoint
     # path('', ProfileListCreateView.as_view(), name='profile_list_create'),  ← remove or comment
     # path('<int:pk>/', ProfileRetrieveUpdateDeleteView.as_view(), name='profile_rud'),  ← remove

@@ -1,4 +1,5 @@
 
+
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -22,8 +23,9 @@ import {
   Select,
   MenuItem,
   Chip,
+  Tooltip,
 } from "@mui/material";
-import { Search, Logout, Folder, Add } from "@mui/icons-material";
+import { Search, Logout, Folder, Add, Message, Description } from "@mui/icons-material";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -59,7 +61,9 @@ const Dashboard = () => {
                   [project.id]: res.data.results || [],
                 }));
               })
-              .catch((err) => console.error(`Failed to fetch proposals for project ${project.id}:`, err));
+              .catch((err) =>
+                console.error(`Failed to fetch proposals for project ${project.id}:`, err)
+              );
           });
 
           setLoading(false);
@@ -115,14 +119,12 @@ const Dashboard = () => {
     }
   };
 
-  // Function to handle Accept/Reject
   const handleStatusChange = (proposalId, newStatus) => {
     api
       .patch(`http://127.0.0.1:8000/api/proposals/${proposalId}/status/`, {
         status: newStatus,
       })
       .then(() => {
-        // Update the proposalsMap optimistically
         setProposalsMap((prev) => {
           const updated = { ...prev };
           Object.keys(updated).forEach((projectId) => {
@@ -133,14 +135,12 @@ const Dashboard = () => {
           return updated;
         });
       })
-      .catch((err) => {
-        console.error("Failed to update proposal status:", err);
-        alert("Failed to update status. Please try again.");
-      });
+      .catch(() => alert("Failed to update status. Please try again."));
   };
 
   return (
     <>
+      {/* ===== HEADER ===== */}
       <AppBar
         position="static"
         sx={{
@@ -149,11 +149,9 @@ const Dashboard = () => {
         }}
       >
         <Toolbar sx={{ justifyContent: "space-between" }}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Typography variant="h6" sx={{ fontWeight: "bold", color: "#EAF6F7" }}>
-              TalentLink
-            </Typography>
-          </Box>
+          <Typography variant="h6" sx={{ fontWeight: "bold", color: "#EAF6F7" }}>
+            TalentLink
+          </Typography>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Avatar
@@ -166,14 +164,25 @@ const Dashboard = () => {
             >
               {avatarLetter}
             </Avatar>
+
             <Box>
-              <Typography variant="body1" sx={{ color: "#EAF6F7" }}>
+              <Typography sx={{ color: "#EAF6F7" }}>
                 {user?.username || "User"}
               </Typography>
               <Typography variant="caption" sx={{ color: "#A0C4C9" }}>
                 {isClient ? "Client" : "Freelancer"}
               </Typography>
             </Box>
+
+            
+
+            {/* CONTRACT ICON WITH TOOLTIP */}
+            <Tooltip title="Contract" arrow>
+              <IconButton color="inherit" onClick={() => navigate("/contracts")}>
+                <Description />
+              </IconButton>
+            </Tooltip>
+
             <IconButton color="inherit" onClick={logout}>
               <Logout />
             </IconButton>

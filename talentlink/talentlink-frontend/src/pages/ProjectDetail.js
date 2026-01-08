@@ -20,17 +20,18 @@ import {
   IconButton,
   Button,
 } from "@mui/material";
-import { MonetizationOn, CalendarToday, ArrowBack } from "@mui/icons-material";
+import { MonetizationOn, CalendarToday, Logout, ArrowBack } from "@mui/icons-material";
 
 function ProjectDetail() {
   const { id } = useParams();
-  const { user, } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const [project, setProject] = useState(null);
-  const [isProjectOwner, setIsProjectOwner] = useState(false);
+  const [isProjectOwner, setIsProjectOwner] = useState(false); // Only for owner-specific actions
   const [loading, setLoading] = useState(true);
 
+  // Determine role from auth context (consistent with Dashboard)
   const isClient = user?.role === "client";
 
   const avatarLetter = user?.username?.charAt(0).toUpperCase() || "U";
@@ -41,6 +42,7 @@ function ProjectDetail() {
       .then((res) => {
         setProject(res.data);
 
+        // Check if current user is the owner of this project (for edit/delete rights)
         const currentUsername = user?.username || localStorage.getItem("username");
         if (res.data.posted_by_username === currentUsername) {
           setIsProjectOwner(true);
@@ -53,6 +55,11 @@ function ProjectDetail() {
         setLoading(false);
       });
   }, [id, user]);
+
+  const handleLogout = () => {
+    logout();           // Clear auth state / token
+    navigate("/login"); // Redirect to login page
+  };
 
   if (loading || !project) {
     return (
@@ -111,7 +118,9 @@ function ProjectDetail() {
                 {isClient ? "Client" : "Freelancer"}
               </Typography>
             </Box>
-            {/* Logout button removed */}
+            <IconButton color="inherit" onClick={handleLogout}>
+              <Logout />
+            </IconButton>
           </Box>
         </Toolbar>
       </AppBar>
@@ -215,6 +224,7 @@ function ProjectDetail() {
 
               {/* Action Buttons */}
               <Box mt={6} sx={{ textAlign: "center" }}>
+                {/* Freelancer: Submit Proposal */}
                 {!isClient && (
                   <Button
                     component={Link}
@@ -234,6 +244,7 @@ function ProjectDetail() {
                   </Button>
                 )}
 
+                {/* Client who owns this project: Could add Edit/Delete later */}
                 {isProjectOwner && (
                   <Typography variant="body2" color="#A0C4C9" sx={{ mt: 3 }}>
                     You posted this project.

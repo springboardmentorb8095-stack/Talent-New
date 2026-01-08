@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
 import { useParams, useNavigate } from "react-router-dom";
@@ -17,12 +15,12 @@ import {
   Avatar,
   IconButton,
 } from "@mui/material";
-import { ArrowBack } from "@mui/icons-material";
+import { ArrowBack, Logout } from "@mui/icons-material";
 
 function SubmitProposal() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, } = useAuth();
+  const { user, logout } = useAuth();
 
   const [coverLetter, setCoverLetter] = useState("");
   const [rate, setRate] = useState("");
@@ -119,7 +117,9 @@ function SubmitProposal() {
                 Freelancer
               </Typography>
             </Box>
-            {/* Logout button removed */}
+            <IconButton color="inherit" onClick={logout}>
+              <Logout />
+            </IconButton>
           </Box>
         </Toolbar>
       </AppBar>

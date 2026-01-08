@@ -2,10 +2,16 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+import warnings
 
 
 def main():
     """Run administrative tasks."""
+    warnings.filterwarnings(
+        "ignore",
+        message="Accessing the database during app initialization is discouraged",
+        category=RuntimeWarning
+    )
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'talentlink.settings')
     try:
         from django.core.management import execute_from_command_line

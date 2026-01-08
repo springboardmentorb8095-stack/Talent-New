@@ -12,6 +12,11 @@ class User(AbstractUser):
         choices=ROLE_CHOICES,
         default='freelancer'
     )
+    email = models.EmailField(
+    unique=True,
+    null=True,
+    blank=True
+    )
 
     def __str__(self):
         return self.username

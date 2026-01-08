@@ -1,3 +1,4 @@
+
 from rest_framework import serializers
 from .models import Proposal
 
@@ -27,3 +28,4 @@ class ProposalListSerializer(serializers.ModelSerializer):
             'status',
             'created_at'
         ]
+

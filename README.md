@@ -26,3 +26,8 @@ WEEK 4 :
 
 1. Proposal model & endpoints: freelancers submit proposals; clients view/manage proposals.
 2. Basic frontend pages: project feed, project details, proposal submission form.
+
+WEEK 5:
+
+1. Contract flow: create contract from accepted proposal and track status.
+2. Messaging APIs and simple UI (WebSocket optional; otherwise long-polling).

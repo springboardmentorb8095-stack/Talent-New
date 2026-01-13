@@ -1,0 +1,11 @@
+Django>=4.0
+djangorestframework
+django-cors-headers
+python-decouple
+dj-database-url
+psycopg2-binary
+whitenoise
+gunicorn
+djangorestframework-simplejwt
+django-filter
+resend

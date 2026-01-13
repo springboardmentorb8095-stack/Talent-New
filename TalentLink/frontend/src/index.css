@@ -1,0 +1,47 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Safe area utilities for mobile devices with notches/home indicators */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.mb-safe {
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Additional mobile safe area support */
+@media (max-width: 768px) {
+  .mobile-safe-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom, 16px), 16px);
+  }
+  
+  .mobile-safe-margin {
+    margin-bottom: max(env(safe-area-inset-bottom, 16px), 16px);
+  }
+}
+
+/* Ensure proper viewport handling */
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}

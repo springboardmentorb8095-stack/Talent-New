@@ -31,3 +31,8 @@ WEEK 5:
 
 1. Contract flow: create contract from accepted proposal and track status.
 2. Messaging APIs and simple UI (WebSocket optional; otherwise long-polling).
+   
+WEEK 6:
+
+1. Notification system (in-app / email placeholders).
+2. Add reviews & rating flow post-completion.

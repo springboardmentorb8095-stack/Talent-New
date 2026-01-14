@@ -6,3 +6,4 @@ from .models import Review
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ('id', 'contract', 'reviewer', 'rating', 'created_at')
     list_filter = ('rating', 'created_at')
+

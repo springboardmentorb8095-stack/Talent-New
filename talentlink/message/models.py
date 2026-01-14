@@ -16,6 +16,7 @@ class Message(models.Model):
     )
     content = models.TextField()
     timestamp = models.DateTimeField(default=timezone.now)
+    
 
     class Meta:
         db_table = 'messages'

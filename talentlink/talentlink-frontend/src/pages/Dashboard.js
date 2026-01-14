@@ -1,5 +1,4 @@
 
-
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -24,8 +23,29 @@ import {
   MenuItem,
   Chip,
   Tooltip,
+  Divider,
+  Fade,
+  Zoom,
 } from "@mui/material";
-import { Search, Logout, Folder, Add, Message, Description } from "@mui/icons-material";
+import {
+  Search,
+  Logout,
+  FolderOpen,
+  AddCircle,
+  Description,
+  MonetizationOn,
+  AccessTime,
+  CheckCircle,
+  Cancel,
+} from "@mui/icons-material";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import Badge from "@mui/material/Badge";
+import {
+  fetchNotifications,
+  markNotificationRead,
+} from "../services/notificationApi";
+import { useSearchParams } from "react-router-dom";
+import { useRef } from "react";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -37,6 +57,44 @@ const Dashboard = () => {
   const [isClient, setIsClient] = useState(false);
   const [loading, setLoading] = useState(true);
   const [proposalsMap, setProposalsMap] = useState({});
+  const [notifications, setNotifications] = useState([]);
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
+  const [searchParams] = useSearchParams();
+  const proposalsRef = useRef(null);
+  useEffect(() => {
+  const tab = searchParams.get("tab");
+
+  if (tab === "proposals" && proposalsRef.current) {
+    setTimeout(() => {
+      proposalsRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 400);
+  }
+}, [searchParams]);
+
+
+  useEffect(() => {
+  fetchNotifications()
+    .then((data) => setNotifications(data))
+    .catch((err) =>
+      console.error("Failed to load notifications", err)
+    );
+}, []);
+
+  const handleNotificationClick = async () => {
+  try {
+    await Promise.all(
+      notifications
+        .filter((n) => !n.is_read)
+        .map((n) => markNotificationRead(n.id))
+    );
+    navigate("/notifications");
+  } catch (err) {
+    console.error("Failed to mark notifications as read", err);
+  }
+};
 
   useEffect(() => {
     if (!user) return;
@@ -114,8 +172,10 @@ const Dashboard = () => {
         return "success";
       case "rejected":
         return "error";
-      default:
+      case "pending":
         return "warning";
+      default:
+        return "default";
     }
   };
 
@@ -140,127 +200,162 @@ const Dashboard = () => {
 
   return (
     <>
-      {/* ===== HEADER ===== */}
-      <AppBar
-        position="static"
-        sx={{
-          background: "linear-gradient(90deg, #0F2E35 0%, #2F6F78 100%)",
-          boxShadow: "none",
-        }}
-      >
-        <Toolbar sx={{ justifyContent: "space-between" }}>
-          <Typography variant="h6" sx={{ fontWeight: "bold", color: "#EAF6F7" }}>
+      {/* ===== MODERN HEADER ===== */}
+      <AppBar position="static" elevation={0} sx={{ background: "#0B2228" }}>
+        <Toolbar sx={{ justifyContent: "space-between", py: 1 }}>
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: 800, letterSpacing: 1, color: "#5E9FA6" }}
+          >
             TalentLink
           </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
+  {/* 🔔 NOTIFICATIONS */}
+  <Tooltip title="Notifications" arrow>
+    <IconButton
+      onClick={handleNotificationClick}
+      sx={{ color: "#A0C4C9" }}
+    >
+      <Badge
+        badgeContent={unreadCount}
+        color="error"
+        overlap="circular"
+      >
+        <NotificationsIcon fontSize="large" />
+      </Badge>
+    </IconButton>
+  </Tooltip>
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Avatar
-              sx={{
-                bgcolor: "#5E9FA6",
-                width: 40,
-                height: 40,
-                fontWeight: "bold",
-              }}
-            >
-              {avatarLetter}
-            </Avatar>
+  {/* 👤 USER INFO */}
+  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+    <Avatar
+      sx={{
+        bgcolor: "#5E9FA6",
+        width: 48,
+        height: 48,
+        fontWeight: "bold",
+        fontSize: "1.4rem",
+        boxShadow: "0 0 15px rgba(94, 159, 166, 0.4)",
+      }}
+    >
+      {avatarLetter}
+    </Avatar>
+    <Box>
+      <Typography variant="subtitle1" sx={{ color: "#EAF6F7", fontWeight: 600 }}>
+        {user?.username || "User"}
+      </Typography>
+      <Typography variant="caption" sx={{ color: "#A0C4C9" }}>
+        {isClient ? "Client" : "Freelancer"}
+      </Typography>
+    </Box>
+  </Box>
 
-            <Box>
-              <Typography sx={{ color: "#EAF6F7" }}>
-                {user?.username || "User"}
-              </Typography>
-              <Typography variant="caption" sx={{ color: "#A0C4C9" }}>
-                {isClient ? "Client" : "Freelancer"}
-              </Typography>
-            </Box>
+  {/* 📄 CONTRACTS */}
+  <Tooltip title="Contracts" arrow>
+    <IconButton
+      color="inherit"
+      onClick={() => navigate("/contracts")}
+      sx={{ color: "#A0C4C9" }}
+    >
+      <Description fontSize="large" />
+    </IconButton>
+  </Tooltip>
 
-            
+  {/* 🚪 LOGOUT */}
+  <IconButton onClick={logout} sx={{ color: "#E57373" }}>
+    <Logout fontSize="large" />
+  </IconButton>
+</Box>
 
-            {/* CONTRACT ICON WITH TOOLTIP */}
-            <Tooltip title="Contract" arrow>
-              <IconButton color="inherit" onClick={() => navigate("/contracts")}>
-                <Description />
-              </IconButton>
-            </Tooltip>
-
-            <IconButton color="inherit" onClick={logout}>
-              <Logout />
-            </IconButton>
-          </Box>
         </Toolbar>
       </AppBar>
 
+      {/* ===== MAIN CONTENT ===== */}
       <Box
         sx={{
-          minHeight: "calc(100vh - 64px)",
-          background: "linear-gradient(135deg, #0F2E35 0%, #2F6F78 100%)",
+          minHeight: "100vh",
+          background: "linear-gradient(135deg, #0B2228 0%, #1A3D45 50%, #2F6F78 100%)",
           color: "#EAF6F7",
-          py: 6,
+          py: { xs: 4, md: 8 },
         }}
       >
-        <Container maxWidth="lg">
-          <Box
-            sx={{
-              background: "rgba(47, 111, 120, 0.3)",
-              borderRadius: 3,
-              p: 4,
-              mb: 5,
-              textAlign: "center",
-            }}
-          >
-            <Typography variant="h4" fontWeight="bold" gutterBottom>
-              Welcome back, {user?.username || "User"}!
-            </Typography>
-            <Typography variant="body1">
-              {isClient
-                ? "Manage your projects and find top talent."
-                : "Explore opportunities and grow your career."}
-            </Typography>
-          </Box>
+        <Container maxWidth="xl">
+          {/* Hero Welcome Section */}
+          <Zoom in timeout={600}>
+            <Box
+              sx={{
+                textAlign: "center",
+                mb: 8,
+                background: "rgba(47, 111, 120, 0.25)",
+                backdropFilter: "blur(10px)",
+                borderRadius: 4,
+                py: 6,
+                px: 4,
+                border: "1px solid rgba(94, 159, 166, 0.3)",
+              }}
+            >
+              <Typography variant="h3" fontWeight="bold" gutterBottom>
+                Welcome back, {user?.username || "User"}!
+              </Typography>
+              <Typography variant="h6" sx={{ color: "#A0C4C9", maxWidth: "700px", mx: "auto" }}>
+                {isClient
+                  ? "Post projects, review proposals, and hire the best talent."
+                  : "Apply to projects, build your reputation, and grow your career."}
+              </Typography>
+            </Box>
+          </Zoom>
 
-          <Box sx={{ textAlign: "center", mb: 5, display: "flex", justifyContent: "center", gap: 3 }}>
-            {isClient && (
+          {/* Action Buttons */}
+          <Box sx={{ textAlign: "center", mb: 6 }}>
+            {isClient ? (
               <Button
                 variant="contained"
-                startIcon={<Add />}
+                size="large"
+                startIcon={<AddCircle />}
                 onClick={() => navigate("/projects/new")}
-                size="large"
                 sx={{
-                  backgroundColor: "#5E9FA6",
-                  "&:hover": { backgroundColor: "#2F6F78" },
-                  px: 4,
-                  py: 1.5,
-                  fontSize: "1.1rem",
+                  bgcolor: "#5E9FA6",
+                  px: 5,
+                  py: 2,
+                  fontSize: "1.2rem",
+                  fontWeight: 600,
+                  borderRadius: 3,
+                  boxShadow: "0 8px 25px rgba(94, 159, 166, 0.4)",
+                  "&:hover": { bgcolor: "#4A858C", transform: "translateY(-3px)" },
+                  transition: "all 0.3s",
                 }}
               >
-                Post New Project
+                Post a New Project
               </Button>
-            )}
-
-            {!isClient && (
+            ) : (
               <Button
                 variant="contained"
-                startIcon={<Folder />}
-                onClick={() => navigate("/project-feed")}
                 size="large"
+                startIcon={<FolderOpen />}
+                onClick={() => navigate("/project-feed")}
                 sx={{
-                  backgroundColor: "#5E9FA6",
-                  "&:hover": { backgroundColor: "#2F6F78" },
-                  px: 4,
-                  py: 1.5,
-                  fontSize: "1.1rem",
+                  bgcolor: "#5E9FA6",
+                  px: 5,
+                  py: 2,
+                  fontSize: "1.2rem",
+                  fontWeight: 600,
+                  borderRadius: 3,
+                  boxShadow: "0 8px 25px rgba(94, 159, 166, 0.4)",
+                  "&:hover": { bgcolor: "#4A858C", transform: "translateY(-3px)" },
+                  transition: "all 0.3s",
                 }}
               >
-                View All Projects
+                Browse Projects
               </Button>
             )}
           </Box>
 
-          <Grid container spacing={2} sx={{ mb: 4 }}>
+          {/* Search & Filter */}
+          <Grid container spacing={3} sx={{ mb: 6 }}>
             <Grid item xs={12} md={isClient ? 12 : 8}>
               <TextField
                 fullWidth
-                placeholder="Search projects..."
+                placeholder="Search by project title..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 InputProps={{
@@ -271,11 +366,13 @@ const Dashboard = () => {
                   ),
                 }}
                 sx={{
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  '& .MuiInputBase-input': { color: "#EAF6F7" },
-                  '& .MuiOutlinedInput-notchedOutline': { borderColor: "#5E9FA6" },
-                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: "#A0C4C9" },
-                  '& .MuiInputLabel-root': { color: "#A0C4C9" },
+                  "& .MuiInputBase-root": {
+                    bgcolor: "rgba(15, 46, 53, 0.6)",
+                    color: "#EAF6F7",
+                    borderRadius: 3,
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": { borderColor: "#5E9FA6" },
+                  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#A0C4C9" },
                 }}
               />
             </Grid>
@@ -283,20 +380,20 @@ const Dashboard = () => {
             {!isClient && (
               <Grid item xs={12} md={4}>
                 <FormControl fullWidth>
-                  <InputLabel sx={{ color: "#A0C4C9" }}>Status</InputLabel>
+                  <InputLabel sx={{ color: "#A0C4C9" }}>Filter by Status</InputLabel>
                   <Select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    label="Status"
+                    label="Filter by Status"
                     sx={{
+                      bgcolor: "rgba(15, 46, 53, 0.6)",
                       color: "#EAF6F7",
-                      ".MuiSvgIcon-root": { color: "#A0C4C9" },
+                      borderRadius: 3,
                       "& .MuiOutlinedInput-notchedOutline": { borderColor: "#5E9FA6" },
-                      "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#A0C4C9" },
-                      backgroundColor: "rgba(255,255,255,0.1)",
+                      "& .MuiSvgIcon-root": { color: "#A0C4C9" },
                     }}
                   >
-                    <MenuItem value="all">All Status</MenuItem>
+                    <MenuItem value="all">All Proposals</MenuItem>
                     <MenuItem value="pending">Pending</MenuItem>
                     <MenuItem value="accepted">Accepted</MenuItem>
                     <MenuItem value="rejected">Rejected</MenuItem>
@@ -306,157 +403,206 @@ const Dashboard = () => {
             )}
           </Grid>
 
-          {/* Dynamic Title: "My Posted Projects" for Client, "My Proposals" for Freelancer */}
-          <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
-            {isClient ? "My Posted Projects" : "My Proposals"}
-          </Typography>
+          {/* My Projects / Proposals Section */}
+          <Fade in timeout={800}>
+            <Box>
+              <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ mb: 4 }}>
+                {isClient ? "My Posted Projects" : "My Proposals"}
+              </Typography>
 
-          {loading ? (
-            <Typography align="center" color="#A0C4C9">
-              Loading...
-            </Typography>
-          ) : filteredItems.length === 0 ? (
-            <Typography align="center" color="#A0C4C9">
-              No {isClient ? "projects" : "proposals"} found. Try adjusting your search.
-            </Typography>
-          ) : (
-            <Grid container spacing={3}>
-              {filteredItems.map((item) => {
-                const projectId = isClient ? item.id : item.project_id || item.project;
-                const uniqueKey = isClient ? projectId : `${projectId}-${item.id}`;
-                const title = isClient ? item.title : item.project_title || "Untitled Project";
+              {loading ? (
+                <Typography align="center" sx={{ py: 8, fontSize: "1.2rem", color: "#A0C4C9" }}>
+                  Loading your data...
+                </Typography>
+              ) : filteredItems.length === 0 ? (
+                <Box sx={{ textAlign: "center", py: 8 }}>
+                  <Typography variant="h6" color="#A0C4C9">
+                    No {isClient ? "projects" : "proposals"} found.
+                  </Typography>
+                  <Typography color="#A0C4C9" mt={1}>
+                    {searchTerm || statusFilter !== "all"
+                      ? "Try adjusting your search or filters."
+                      : isClient
+                      ? "Start by posting your first project!"
+                      : "Browse projects and submit your first proposal."}
+                  </Typography>
+                </Box>
+              ) : (
+                <Grid container spacing={4}>
+                  {filteredItems.map((item) => {
+                    const projectId = isClient ? item.id : item.project_id || item.project;
+                    const title = isClient ? item.title : item.project_title || item.project?.title || "Untitled Project";
 
-                return (
-                  <Grid item xs={12} md={6} key={uniqueKey}>
-                    <Card
-                      elevation={6}
-                      sx={{
-                        background: "rgba(15, 46, 53, 0.8)",
-                        color: "#EAF6F7",
-                        borderRadius: 3,
-                      }}
-                    >
-                      <CardContent>
-                        <Typography variant="h6" gutterBottom>
-                          {title}
-                        </Typography>
-
-                        {!isClient && item.status && (
-                          <Chip
-                            label={item.status.toUpperCase()}
-                            color={getStatusColor(item.status)}
-                            size="small"
-                            sx={{ mb: 2 }}
-                          />
-                        )}
-
-                        <Box sx={{ mt: 3, display: "flex", gap: 2, flexWrap: "wrap" }}>
-                          <Button
-                            variant="contained"
-                            onClick={() => navigate(`/projects/${projectId}`)}
+                    return (
+                      <Grid item xs={12} md={6} lg={4} key={isClient ? projectId : item.id}>
+                        <Fade in timeout={1000}>
+                          <Card
                             sx={{
-                              backgroundColor: "#5E9FA6",
-                              "&:hover": { backgroundColor: "#2F6F78" },
+                              bgcolor: "rgba(15, 46, 53, 0.85)",
+                              backdropFilter: "blur(10px)",
+                              border: "1px solid rgba(94, 159, 166, 0.3)",
+                              borderRadius: 4,
+                              transition: "all 0.3s ease",
+                              "&:hover": {
+                                transform: "translateY(-10px)",
+                                boxShadow: "0 15px 35px rgba(0,0,0,0.5)",
+                                borderColor: "#5E9FA6",
+                              },
                             }}
                           >
-                            View Details
-                          </Button>
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                );
-              })}
-            </Grid>
-          )}
+                            <CardContent sx={{ p: 4 }}>
+                              <Typography variant="h6" fontWeight="bold" gutterBottom>
+                                {title}
+                              </Typography>
 
-          {/* Client Proposals Section */}
+                              {!isClient && item.status && (
+                                <Chip
+                                  icon={item.status === "accepted" ? <CheckCircle /> : item.status === "rejected" ? <Cancel /> : <AccessTime />}
+                                  label={item.status.toUpperCase()}
+                                  color={getStatusColor(item.status)}
+                                  sx={{ mb: 3, fontWeight: 600 }}
+                                />
+                              )}
+
+                              {item.proposed_rate && !isClient && (
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 3, color: "#A0C4C9" }}>
+                                  <MonetizationOn fontSize="small" />
+                                  <Typography variant="body1">
+                                    Proposed: <strong>${item.proposed_rate}</strong>
+                                  </Typography>
+                                </Box>
+                              )}
+
+                              <Button
+                                fullWidth
+                                variant="contained"
+                                onClick={() => navigate(`/projects/${projectId}`)}
+                                sx={{
+                                  mt: 2,
+                                  bgcolor: "#5E9FA6",
+                                  py: 1.5,
+                                  fontWeight: 600,
+                                  "&:hover": { bgcolor: "#4A858C" },
+                                }}
+                              >
+                                View Details
+                              </Button>
+                            </CardContent>
+                          </Card>
+                        </Fade>
+                      </Grid>
+                    );
+                  })}
+                </Grid>
+              )}
+            </Box>
+          </Fade>
+
+          {/* Client-Only: Proposals Received Section */}
           {isClient && (
-            <>
-              <Typography variant="h5" gutterBottom sx={{ mt: 5, mb: 3 }}>
-                My Proposals
+          <Box ref={proposalsRef} sx={{ mt: 10 }}>
+
+              <Typography variant="h4" fontWeight="bold" gutterBottom>
+                Proposals Received
               </Typography>
-              {Object.keys(proposalsMap).length === 0 ? (
-                <Typography align="center" color="#A0C4C9">
-                  No proposals found yet.
+              <Divider sx={{ bgcolor: "rgba(94, 159, 166, 0.3)", my: 3 }} />
+
+              {Object.keys(proposalsMap).length === 0 || projects.length === 0 ? (
+                <Typography sx={{ py: 6, textAlign: "center", color: "#A0C4C9", fontSize: "1.2rem" }}>
+                  No proposals received yet.
                 </Typography>
               ) : (
-                Object.entries(proposalsMap).map(([projectId, proposals]) => (
-                  <Box key={projectId} sx={{ mb: 4 }}>
-                    <Typography variant="h6" gutterBottom>
-                      Project: {projects.find((p) => p.id.toString() === projectId)?.title || "Untitled Project"}
-                    </Typography>
+                Object.entries(proposalsMap).map(([projectId, proposals]) => {
+                  const project = projects.find((p) => p.id.toString() === projectId);
+                  if (!project) return null;
 
-                    {proposals.length === 0 ? (
-                      <Typography color="#A0C4C9">No proposals for this project yet.</Typography>
-                    ) : (
-                      <Grid container spacing={3}>
-                        {proposals.map((proposal) => (
-                          <Grid item xs={12} md={6} key={proposal.id}>
-                            <Card
-                              elevation={6}
-                              sx={{
-                                background: "rgba(15, 46, 53, 0.8)",
-                                color: "#EAF6F7",
-                                borderRadius: 3,
-                              }}
-                            >
-                              <CardContent>
-                                <Typography variant="body1" gutterBottom>
-                                  Freelancer: {proposal.freelancer_username || "Unknown"}
-                                </Typography>
-                                <Typography variant="body2">
-                                  Proposed Rate: ${proposal.proposed_rate}
-                                </Typography>
-                                <Chip
-                                  label={proposal.status.toUpperCase()}
-                                  color={getStatusColor(proposal.status)}
-                                  size="small"
-                                  sx={{ mt: 1 }}
-                                />
+                  return (
+                    <Box key={projectId} sx={{ mb: 6 }}>
+                      <Typography variant="h5" gutterBottom sx={{ color: "#5E9FA6" }}>
+                        {project.title}
+                      </Typography>
 
-                                {/* Accept & Reject Buttons - Only show when status is pending */}
-                                {proposal.status?.toLowerCase() === "pending" && (
-                                  <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
-                                    <Button
-                                      variant="contained"
-                                      color="success"
-                                      onClick={() => handleStatusChange(proposal.id, "accepted")}
-                                    >
-                                      Accept
-                                    </Button>
-                                    <Button
-                                      variant="contained"
-                                      color="error"
-                                      onClick={() => handleStatusChange(proposal.id, "rejected")}
-                                    >
-                                      Reject
-                                    </Button>
+                      {proposals.length === 0 ? (
+                        <Typography color="#A0C4C9">No proposals yet for this project.</Typography>
+                      ) : (
+                        <Grid container spacing={4}>
+                          {proposals.map((proposal) => (
+                            <Grid item xs={12} md={6} lg={4} key={proposal.id}>
+                              <Card
+                                sx={{
+                                  bgcolor: "rgba(15, 46, 53, 0.85)",
+                                  border: "1px solid rgba(94, 159, 166, 0.3)",
+                                  borderRadius: 4,
+                                  transition: "0.3s",
+                                  "&:hover": { borderColor: "#5E9FA6", transform: "translateY(-5px)" },
+                                }}
+                              >
+                                <CardContent sx={{ p: 4 }}>
+                                  <Typography variant="h6" gutterBottom>
+                                    {proposal.freelancer_username || "Freelancer"}
+                                  </Typography>
+
+                                  <Box sx={{ mb: 2 }}>
+                                    <Typography variant="body2" color="#A0C4C9">
+                                      Proposed Rate
+                                    </Typography>
+                                    <Typography variant="h6" fontWeight="bold">
+                                      ${proposal.proposed_rate}
+                                    </Typography>
                                   </Box>
-                                )}
 
-                                <Box sx={{ mt: 2 }}>
+                                  <Chip
+                                    label={proposal.status.toUpperCase()}
+                                    color={getStatusColor(proposal.status)}
+                                    sx={{ mb: 3 }}
+                                  />
+
+                                  {proposal.status?.toLowerCase() === "pending" && (
+                                    <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+                                      <Button
+                                        variant="contained"
+                                        color="success"
+                                        startIcon={<CheckCircle />}
+                                        onClick={() => handleStatusChange(proposal.id, "accepted")}
+                                        fullWidth
+                                      >
+                                        Accept
+                                      </Button>
+                                      <Button
+                                        variant="contained"
+                                        color="error"
+                                        startIcon={<Cancel />}
+                                        onClick={() => handleStatusChange(proposal.id, "rejected")}
+                                        fullWidth
+                                      >
+                                        Reject
+                                      </Button>
+                                    </Box>
+                                  )}
+
                                   <Button
-                                    variant="contained"
-                                    onClick={() => navigate(`/projects/${projectId}`)}
+                                    fullWidth
+                                    variant="outlined"
                                     sx={{
-                                      backgroundColor: "#5E9FA6",
-                                      "&:hover": { backgroundColor: "#2F6F78" },
+                                      borderColor: "#5E9FA6",
+                                      color: "#5E9FA6",
+                                      "&:hover": { bgcolor: "rgba(94, 159, 166, 0.2)", borderColor: "#5E9FA6" },
                                     }}
+                                    onClick={() => navigate(`/projects/${projectId}`)}
                                   >
                                     View Project
                                   </Button>
-                                </Box>
-                              </CardContent>
-                            </Card>
-                          </Grid>
-                        ))}
-                      </Grid>
-                    )}
-                  </Box>
-                ))
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                          ))}
+                        </Grid>
+                      )}
+                    </Box>
+                  );
+                })
               )}
-            </>
+            </Box>
           )}
         </Container>
       </Box>
@@ -465,3 +611,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+

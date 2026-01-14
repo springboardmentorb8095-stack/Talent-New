@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'review',
     'message',
     'contracts',
+    'notifications',
+
 ]
 
 MIDDLEWARE = [
@@ -171,6 +173,24 @@ CORS_ALLOW_METHODS = [
     "POST",
     "PUT",
 ]
+
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+
+# EMAIL_HOST_USER = 'dhivya01052004@gmail.com'
+# EMAIL_HOST_PASSWORD = 'mbfl qpjz bjnu cszc'
+
+# Dummy email backend — prints emails to console
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# You can keep these as dummy values
+EMAIL_HOST_USER = 'test@example.com'
+EMAIL_HOST_PASSWORD = 'dummy'
+
+
 
 CORS_ALLOW_HEADERS = [
     "accept",

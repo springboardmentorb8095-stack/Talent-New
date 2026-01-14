@@ -24,9 +24,10 @@ class Proposal(models.Model):
         ('accepted', 'Accepted'),
         ('rejected', 'Rejected'),
     ], default='pending')
-    created_at = models.DateTimeField(default=timezone.now)
-
     
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
     class Meta:
         db_table = 'proposals'

@@ -103,59 +103,74 @@ const MessagingPage = () => {
           <IconButton edge="start" color="inherit" onClick={() => navigate(-1)}>
             <ArrowBackIcon />
           </IconButton>
-          <Typography variant="h6">Messages</Typography>
+          <Typography variant="h6" sx={{ fontWeight: "bold", color: "#14323eff" }}>
+            Messages
+          </Typography>
         </Toolbar>
       </AppBar>
 
-      <Grid container sx={{ flex: 1 }}>
+      <Grid container sx={{ flex: 1, minHeight: 0 }}>
         <Grid
           item
           xs={4}
           sx={{
             borderRight: `1px solid ${theme.palette.divider}`,
             bgcolor: theme.palette.background.paper,
+            display: "flex",
+            flexDirection: "column",
+            minHeight: 0,
           }}
         >
           <Box sx={{ p: 2 }}>
-            <Typography variant="h6" color="text.primary">
+            <Typography variant="h6" color="text.primary" sx={{ fontWeight: "bold" }}>
               Conversations
             </Typography>
           </Box>
           <Divider />
 
-          {conversations.map((user) => (
-            <Card
-              key={user.id}
-              sx={{
-                m: 1,
-                cursor: "pointer",
-                bgcolor:
-                  selectedUser?.id === user.id
-                    ? theme.palette.primary.light
-                    : theme.palette.background.paper,
-              }}
-              onClick={() => setSelectedUser(user)}
-            >
-              <CardContent sx={{ display: "flex", alignItems: "center" }}>
-                <Avatar sx={{ mr: 2, bgcolor: theme.palette.primary.main }}>
-                  {user.username?.[0]?.toUpperCase()}
-                </Avatar>
-                <Box>
-                  <Typography fontWeight="bold" color="text.primary">
-                    {user.username}
-                  </Typography>
-                  {user.last_message && (
-                    <Typography variant="body2" color="text.secondary">
-                      {user.last_message.content}
+          <Box sx={{ flex: 1, overflowY: "auto" }}>
+            {conversations.map((user) => (
+              <Card
+                key={user.id}
+                sx={{
+                  m: 1,
+                  cursor: "pointer",
+                  bgcolor:
+                    selectedUser?.id === user.id
+                      ? theme.palette.primary.light
+                      : theme.palette.background.paper,
+                }}
+                onClick={() => setSelectedUser(user)}
+              >
+                <CardContent sx={{ display: "flex", alignItems: "center" }}>
+                  <Avatar sx={{ mr: 2, bgcolor: theme.palette.primary.main }}>
+                    {user.username?.[0]?.toUpperCase()}
+                  </Avatar>
+                  <Box>
+                    <Typography fontWeight="bold" color="text.primary">
+                      {user.username}
                     </Typography>
-                  )}
-                </Box>
-              </CardContent>
-            </Card>
-          ))}
+                    {user.last_message && (
+                      <Typography variant="body2" color="text.secondary">
+                        {user.last_message.content}
+                      </Typography>
+                    )}
+                  </Box>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
         </Grid>
 
-        <Grid item xs={8} sx={{ display: "flex", flexDirection: "column" }}>
+        <Grid
+          item
+          xs={8}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            minHeight: 0,
+          }}
+        >
           {!selectedUser ? (
             <Box
               sx={{
@@ -178,12 +193,20 @@ const MessagingPage = () => {
                   bgcolor: theme.palette.background.paper,
                 }}
               >
-                <Typography variant="h6" color="text.primary">
+                <Typography variant="h6" color="text.primary" sx={{ fontWeight: "bold" }}>
                   Chat with {selectedUser.username}
                 </Typography>
               </Box>
 
-              <Box sx={{ flex: 1, p: 2, overflowY: "auto" }}>
+              {/* ⚡ Chat messages box */}
+              <Box
+                sx={{
+                  flex: 1,
+                  p: 2,
+                  overflowY: "auto",
+                  bgcolor: theme.palette.background.default,
+                }}
+              >
                 {messages.map((msg) => {
                   const isMine = msg.sender !== selectedUser.id;
 
@@ -209,9 +232,7 @@ const MessagingPage = () => {
                             : theme.palette.text.primary,
                         }}
                       >
-                        <Typography variant="body2">
-                          {msg.content}
-                        </Typography>
+                        <Typography variant="body2">{msg.content}</Typography>
                       </Box>
                     </Box>
                   );
@@ -219,7 +240,7 @@ const MessagingPage = () => {
                 <div ref={bottomRef} />
               </Box>
 
-              {/* 🔥 ONLY THIS TextField IS DARK MODE */}
+              {/* 🔥 Input box */}
               <Box
                 sx={{
                   p: 2,
@@ -236,34 +257,14 @@ const MessagingPage = () => {
                     sx={{
                       backgroundColor: "#0F2E35",
                       borderRadius: 1,
-
-                      "& .MuiInputBase-input": {
-                        color: "#FFFFFF",
-                      },
-
-                      "& .MuiInputBase-input::placeholder": {
-                        color: "#B0BEC5",
-                        opacity: 1,
-                      },
-
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#1E4D55",
-                      },
-
-                      "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#4DD0E1",
-                      },
-
-                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#4DD0E1",
-                      },
+                      "& .MuiInputBase-input": { color: "#FFFFFF" },
+                      "& .MuiInputBase-input::placeholder": { color: "#B0BEC5", opacity: 1 },
+                      "& .MuiOutlinedInput-notchedOutline": { borderColor: "#1E4D55" },
+                      "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#4DD0E1" },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#4DD0E1" },
                     }}
                   />
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={sendMessage}
-                  >
+                  <Button variant="contained" color="primary" onClick={sendMessage}>
                     Send
                   </Button>
                 </Box>

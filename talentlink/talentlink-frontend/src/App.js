@@ -15,6 +15,8 @@ import SubmitProposal from "./pages/SubmitProposal";
 import NewProject from "./pages/NewProject";
 import MessagingPage from './pages/MessagingPage';
 import ContractsPage from "./pages/ContractsPage";
+import NotificationsPage from "./pages/NotificationsPage";
+
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return <div>Loading...</div>;
@@ -40,6 +42,9 @@ function App() {
               <Route path="/projects/new" element={<NewProject />} />
               <Route path="/messages/" element={<MessagingPage />} />
               <Route path="/contracts" element={<ContractsPage />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
+             
+
             </Routes>
           </Router>
         </AuthProvider>

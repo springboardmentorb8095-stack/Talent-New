@@ -1,5 +1,6 @@
 
 
+
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import { useParams, useNavigate, Link } from "react-router-dom";
@@ -19,8 +20,15 @@ import {
   Avatar,
   IconButton,
   Button,
+  Fade,
+  Zoom,
 } from "@mui/material";
-import { MonetizationOn, CalendarToday, Logout, ArrowBack } from "@mui/icons-material";
+import {
+  MonetizationOn,
+  CalendarToday,
+  Logout,
+  ArrowBack,
+} from "@mui/icons-material";
 
 function ProjectDetail() {
   const { id } = useParams();
@@ -28,12 +36,10 @@ function ProjectDetail() {
   const navigate = useNavigate();
 
   const [project, setProject] = useState(null);
-  const [isProjectOwner, setIsProjectOwner] = useState(false); // Only for owner-specific actions
+  const [isProjectOwner, setIsProjectOwner] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Determine role from auth context (consistent with Dashboard)
   const isClient = user?.role === "client";
-
   const avatarLetter = user?.username?.charAt(0).toUpperCase() || "U";
 
   useEffect(() => {
@@ -42,8 +48,8 @@ function ProjectDetail() {
       .then((res) => {
         setProject(res.data);
 
-        // Check if current user is the owner of this project (for edit/delete rights)
-        const currentUsername = user?.username || localStorage.getItem("username");
+        const currentUsername =
+          user?.username || localStorage.getItem("username");
         if (res.data.posted_by_username === currentUsername) {
           setIsProjectOwner(true);
         }
@@ -57,8 +63,8 @@ function ProjectDetail() {
   }, [id, user]);
 
   const handleLogout = () => {
-    logout();           // Clear auth state / token
-    navigate("/login"); // Redirect to login page
+    logout();
+    navigate("/login");
   };
 
   if (loading || !project) {
@@ -69,7 +75,8 @@ function ProjectDetail() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #0F2E35 0%, #2F6F78 100%)",
+          background:
+            "linear-gradient(135deg, #0B2228 0%, #1A3D45 50%, #2F6F78 100%)",
         }}
       >
         <Typography variant="h5" color="#EAF6F7">
@@ -81,20 +88,17 @@ function ProjectDetail() {
 
   return (
     <>
-      {/* Top AppBar */}
-      <AppBar
-        position="static"
-        sx={{
-          background: "linear-gradient(90deg, #0F2E35 0%, #2F6F78 100%)",
-          boxShadow: "none",
-        }}
-      >
+      {/* ===== HEADER ===== */}
+      <AppBar position="static" elevation={0} sx={{ background: "#0B2228" }}>
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <IconButton color="inherit" onClick={() => navigate(-1)}>
+            <IconButton sx={{ color: "#A0C4C9" }} onClick={() => navigate(-1)}>
               <ArrowBack />
             </IconButton>
-            <Typography variant="h6" sx={{ fontWeight: "bold", color: "#EAF6F7" }}>
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 800, color: "#5E9FA6" }}
+            >
               TalentLink
             </Typography>
           </Box>
@@ -103,156 +107,189 @@ function ProjectDetail() {
             <Avatar
               sx={{
                 bgcolor: "#5E9FA6",
-                width: 40,
-                height: 40,
+                width: 42,
+                height: 42,
                 fontWeight: "bold",
               }}
             >
               {avatarLetter}
             </Avatar>
             <Box>
-              <Typography variant="body1" sx={{ color: "#EAF6F7" }}>
+              <Typography variant="body2" sx={{ color: "#EAF6F7" }}>
                 {user?.username || "User"}
               </Typography>
               <Typography variant="caption" sx={{ color: "#A0C4C9" }}>
                 {isClient ? "Client" : "Freelancer"}
               </Typography>
             </Box>
-            <IconButton color="inherit" onClick={handleLogout}>
-              <Logout />
+            
+            <IconButton onClick={handleLogout} sx={{ color: "#E57373" }}>
+                          <Logout fontSize="large" />
             </IconButton>
           </Box>
         </Toolbar>
       </AppBar>
 
-      {/* Main Content */}
+      {/* ===== PAGE BACKGROUND ===== */}
       <Box
         sx={{
           minHeight: "calc(100vh - 64px)",
-          background: "linear-gradient(135deg, #0F2E35 0%, #2F6F78 100%)",
+          background:
+            "linear-gradient(135deg, #0B2228 0%, #1A3D45 50%, #2F6F78 100%)",
+          py: 8,
           color: "#EAF6F7",
-          py: 6,
         }}
       >
         <Container maxWidth="lg">
-          <Box sx={{ mb: 5, textAlign: "center" }}>
-            <Typography variant="h3" fontWeight="bold" gutterBottom>
-              {project.title}
-            </Typography>
-            <Typography variant="body1" color="#A0C4C9">
-              Explore the details of this project
-            </Typography>
-          </Box>
+          {/* ===== HERO ===== */}
+          <Zoom in timeout={600}>
+            <Box
+              sx={{
+                textAlign: "center",
+                mb: 6,
+                background: "rgba(47, 111, 120, 0.25)",
+                backdropFilter: "blur(10px)",
+                borderRadius: 4,
+                py: 5,
+                px: 4,
+                border: "1px solid rgba(94,159,166,0.3)",
+              }}
+            >
+              <Typography variant="h3" fontWeight="bold" gutterBottom>
+                {project.title}
+              </Typography>
+              <Typography color="#A0C4C9">
+                Detailed overview of the project
+              </Typography>
+            </Box>
+          </Zoom>
 
-          {/* Project Details Card */}
-          <Card
-            elevation={6}
-            sx={{
-              mb: 5,
-              borderRadius: 3,
-              background: "rgba(15, 46, 53, 0.85)",
-              color: "#EAF6F7",
-            }}
-          >
-            <CardContent sx={{ p: 5 }}>
-              <Divider sx={{ my: 3, borderColor: "#5E9FA6" }} />
+          {/* ===== PROJECT CARD ===== */}
+          <Fade in timeout={900}>
+            <Card
+              sx={{
+                borderRadius: 4,
+                background: "rgba(15, 46, 53, 0.85)",
+                backdropFilter: "blur(12px)",
+                border: "1px solid rgba(94,159,166,0.3)",
+              }}
+            >
+              <CardContent sx={{ p: 6 }}>
+                {/* Meta */}
+                <Grid container spacing={4}>
+                  <Grid item xs={12} md={6}>
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <MonetizationOn sx={{ color: "#5E9FA6", fontSize: 42 }} />
+                      <Box>
+                        <Typography variant="caption" color="#A0C4C9">
+                          BUDGET
+                        </Typography>
+                        <Typography variant="h5" fontWeight="bold">
+                          ${parseFloat(project.budget || 0).toFixed(2)}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Grid>
 
-              <Grid container spacing={4}>
-                <Grid item xs={12} sm={6}>
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <MonetizationOn sx={{ color: "#5E9FA6", fontSize: 40 }} />
-                    <Box>
-                      <Typography variant="caption" color="#A0C4C9">
-                        BUDGET
-                      </Typography>
-                      <Typography variant="h5" fontWeight="bold">
-                        ${parseFloat(project.budget || 0).toFixed(2)}
-                      </Typography>
-                    </Box>
-                  </Stack>
+                  <Grid item xs={12} md={6}>
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <CalendarToday sx={{ color: "#5E9FA6", fontSize: 42 }} />
+                      <Box>
+                        <Typography variant="caption" color="#A0C4C9">
+                          DURATION
+                        </Typography>
+                        <Typography variant="h5" fontWeight="bold">
+                          {project.duration || "N/A"} days
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Grid>
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <CalendarToday sx={{ color: "#5E9FA6", fontSize: 40 }} />
-                    <Box>
-                      <Typography variant="caption" color="#A0C4C9">
-                        DURATION
-                      </Typography>
-                      <Typography variant="h5" fontWeight="bold">
-                        {project.duration || "N/A"} days
-                      </Typography>
-                    </Box>
-                  </Stack>
-                </Grid>
-              </Grid>
+                <Divider sx={{ my: 5, borderColor: "#5E9FA6" }} />
 
-              <Box mt={5}>
-                <Typography variant="h6" gutterBottom sx={{ color: "#A0C4C9" }}>
+                {/* Description */}
+                <Typography variant="h6" sx={{ color: "#A0C4C9" }} gutterBottom>
                   Project Description
                 </Typography>
-                <Typography variant="body1" lineHeight={1.8}>
+                <Typography lineHeight={1.9}>
                   {project.description || "No description provided."}
                 </Typography>
-              </Box>
 
-              <Box mt={5}>
-                <Typography variant="h6" gutterBottom sx={{ color: "#A0C4C9" }}>
-                  Skills Required
-                </Typography>
-                <Stack direction="row" spacing={1} flexWrap="wrap">
-                  {(project.skills || []).length > 0 ? (
-                    project.skills.map((skill) => (
-                      <Chip
-                        key={skill}
-                        label={skill}
-                        variant="outlined"
-                        sx={{
-                          color: "#EAF6F7",
-                          borderColor: "#5E9FA6",
-                          "&:hover": { bgcolor: "rgba(94, 159, 166, 0.2)" },
-                        }}
-                      />
-                    ))
-                  ) : (
-                    <Typography variant="body2" color="#A0C4C9">
-                      No skills specified
+                {/* Skills */}
+                <Box mt={5}>
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    sx={{ color: "#A0C4C9" }}
+                  >
+                    Skills Required
+                  </Typography>
+
+                  <Stack direction="row" spacing={1} flexWrap="wrap">
+                    {(project.skills || []).length > 0 ? (
+                      project.skills.map((skill) => (
+                        <Chip
+                          key={skill}
+                          label={skill}
+                          variant="outlined"
+                          sx={{
+                            color: "#EAF6F7",
+                            borderColor: "#5E9FA6",
+                            mb: 1,
+                            "&:hover": {
+                              bgcolor: "rgba(94,159,166,0.2)",
+                            },
+                          }}
+                        />
+                      ))
+                    ) : (
+                      <Typography color="#A0C4C9">
+                        No skills specified
+                      </Typography>
+                    )}
+                  </Stack>
+                </Box>
+
+                {/* Actions */}
+                <Box mt={7} textAlign="center">
+                  {!isClient && (
+                    <Button
+                      component={Link}
+                      to={`/projects/${id}/apply`}
+                      variant="contained"
+                      size="large"
+                      sx={{
+                        px: 7,
+                        py: 2,
+                        fontSize: "1.1rem",
+                        fontWeight: 600,
+                        borderRadius: 3,
+                        bgcolor: "#5E9FA6",
+                        "&:hover": {
+                          bgcolor: "#4A858C",
+                          transform: "translateY(-3px)",
+                        },
+                        transition: "0.3s",
+                      }}
+                    >
+                      Submit Proposal
+                    </Button>
+                  )}
+
+                  {isProjectOwner && (
+                    <Typography
+                      variant="body2"
+                      color="#A0C4C9"
+                      mt={3}
+                    >
+                      You posted this project.
                     </Typography>
                   )}
-                </Stack>
-              </Box>
-
-              {/* Action Buttons */}
-              <Box mt={6} sx={{ textAlign: "center" }}>
-                {/* Freelancer: Submit Proposal */}
-                {!isClient && (
-                  <Button
-                    component={Link}
-                    to={`/projects/${id}/apply`}
-                    variant="contained"
-                    size="large"
-                    sx={{
-                      backgroundColor: "#5E9FA6",
-                      "&:hover": { backgroundColor: "#2F6F78" },
-                      px: 6,
-                      py: 1.8,
-                      fontSize: "1.2rem",
-                      borderRadius: 3,
-                    }}
-                  >
-                    SUBMIT PROPOSAL
-                  </Button>
-                )}
-
-                {/* Client who owns this project: Could add Edit/Delete later */}
-                {isProjectOwner && (
-                  <Typography variant="body2" color="#A0C4C9" sx={{ mt: 3 }}>
-                    You posted this project.
-                  </Typography>
-                )}
-              </Box>
-            </CardContent>
-          </Card>
+                </Box>
+              </CardContent>
+            </Card>
+          </Fade>
         </Container>
       </Box>
     </>

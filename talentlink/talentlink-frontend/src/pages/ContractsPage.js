@@ -17,12 +17,195 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Rating,
+  TextField,
+  Alert,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
+
+
+
+/* ================= REVIEW FORM / SUCCESS COMPONENT ================= */
+const ReviewForm = ({ contractId, onReviewSubmitted, submittedReview }) => {
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [newReview] = useState(null);
+
+  // Combine existing review or newly submitted review
+  const displayReview = submittedReview || newReview;
+
+  // If review already exists → show success view
+  if (submittedReview || success) {
+    return (
+      <Card sx={{ mt: 2, borderRadius: 3, background: "rgba(15,46,53,0.85)" }}>
+        <CardContent>
+          <Typography variant="subtitle1" fontWeight="bold" gutterBottom sx={{ color: "#EAF6F7" }}>
+          Review Submitted
+         {displayReview?.reviewer?.username && (
+            <> by <strong>{displayReview.reviewer.username}</strong></>
+        )}
+        </Typography>
+
+          <Alert
+            severity="success"
+            sx={{
+              mb: 3,
+              backgroundColor: "rgba(46, 125, 50, 0.35)",
+              color: "#C8E6C9",
+              border: "1px solid #4CAF50",
+              "& .MuiAlert-icon": { color: "#81C784" },
+            }}
+          >
+            Review Submitted Successfully!
+            
+          </Alert>
+
+          {submittedReview && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2" sx={{ color: "#A0C4C9", mb: 1 }}>
+                Your rating:
+              </Typography>
+              <Rating
+                value={submittedReview.rating}
+                readOnly
+                precision={1}
+                sx={{
+                  "& .MuiRating-iconFilled": {
+                    color: "#FFD700",
+                    filter: "drop-shadow(0 0 3px #FFD70077)",
+                  },
+                  "& .MuiRating-iconEmpty": { color: "#FFD70033" },
+                }}
+              />
+              {submittedReview.comment && (
+                <>
+                  <Typography variant="body2" sx={{ color: "#A0C4C9", mt: 2, mb: 1 }}>
+                    Your comment:
+                  </Typography>
+                  <Typography color="#EAF6F7">
+                    "{submittedReview.comment}"
+                  </Typography>
+                </>
+              )}
+            </Box>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const handleSubmit = () => {
+    if (rating === 0) {
+      alert("Please select a rating.");
+      return;
+    }
+
+    setLoading(true);
+
+    api
+      .post(`/reviews/add/${contractId}/`, { rating, comment })
+      .then(() => {
+        setSuccess(true);
+        setRating(0);
+        setComment("");
+        onReviewSubmitted?.(); // Trigger reload of contracts
+      })
+      .catch((err) => {
+        console.error("Review submission failed:", err);
+        alert("Failed to submit review. Please try again.");
+      })
+      .finally(() => setLoading(false));
+  };
+
+  return (
+    <Card sx={{ mt: 2, borderRadius: 3, background: "rgba(15,46,53,0.85)" }}>
+      <CardContent>
+        <Typography variant="subtitle1" fontWeight="bold" gutterBottom sx={{ color: "#EAF6F7" }}>
+          Add Your Review
+        </Typography>
+
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
+          <Typography sx={{ color: "#A0C4C9" }}>Rating:</Typography>
+          <Rating
+            name={`rating-${contractId}`}
+            value={rating}
+            onChange={(e, newValue) => setRating(newValue)}
+            precision={1}
+            icon={<span style={{ fontSize: "2rem" }}>★</span>}
+            emptyIcon={<span style={{ fontSize: "2rem", opacity: 0.3 }}>★</span>}
+            sx={{
+              "& .MuiRating-iconFilled": {
+                color: "#FFD700",
+                filter: "drop-shadow(0 0 4px #FFD70088)",
+              },
+              "& .MuiRating-iconHover": {
+                color: "#FFEB3B",
+                filter: "drop-shadow(0 0 6px #FFEB3Baa)",
+              },
+              "& .MuiRating-iconEmpty": {
+                color: "#FFD70044",
+              },
+            }}
+          />
+        </Box>
+
+        <TextField
+          label="Comment (optional)"
+          variant="outlined"
+          fullWidth
+          multiline
+          minRows={3}
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          sx={{
+            mb: 3,
+            "& .MuiOutlinedInput-root": {
+              color: "#EAF6F7",
+              backgroundColor: "rgba(10, 35, 42, 0.6)",
+              borderRadius: 2,
+              "& fieldset": { borderColor: "#5E9FA6" },
+              "&:hover fieldset": { borderColor: "#7ABAC6" },
+              "&.Mui-focused fieldset": {
+                borderColor: "#5E9FA6",
+                boxShadow: "0 0 0 1px #5E9FA650",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              color: "#A0C4C9",
+              "&.Mui-focused": { color: "#5E9FA6" },
+            },
+          }}
+        />
+
+        <Button
+          variant="contained"
+          onClick={handleSubmit}
+          disabled={loading}
+          fullWidth
+          sx={{
+            py: 1.5,
+            backgroundColor: "#5E9FA6",
+            "&:hover": { backgroundColor: "#2F6F78" },
+            "&:disabled": {
+              backgroundColor: "#3A5F65",
+              color: "#8AA8AD",
+            },
+          }}
+        >
+          {loading ? "Submitting..." : "Submit Review"}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
+
+/* ================= MAIN CONTRACTS PAGE ================= */
 const ContractsPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -35,9 +218,6 @@ const ContractsPage = () => {
   const isClient = user?.role === "client";
   const avatarLetter = user?.username?.[0]?.toUpperCase() || "U";
 
-  /* -----------------------------
-     Load Contracts
-  ------------------------------ */
   const loadContracts = useCallback(() => {
     api
       .get("http://127.0.0.1:8000/api/contracts/my/")
@@ -48,9 +228,6 @@ const ContractsPage = () => {
       .catch((err) => console.error("Failed to fetch contracts:", err));
   }, []);
 
-  /* -----------------------------
-     Load Accepted Proposals (Client)
-  ------------------------------ */
   const loadAcceptedProposals = useCallback(() => {
     if (!user || !isClient) {
       setLoading(false);
@@ -91,9 +268,6 @@ const ContractsPage = () => {
     loadAcceptedProposals();
   }, [loadContracts, loadAcceptedProposals]);
 
-  /* -----------------------------
-     Create Contract
-  ------------------------------ */
   const createContract = () => {
     if (!selectedProposal) return;
 
@@ -108,221 +282,166 @@ const ContractsPage = () => {
       .catch(() => alert("Failed to create contract."));
   };
 
-  /* -----------------------------
-     Update Contract Status
-  ------------------------------ */
   const updateContractStatus = (contractId, status) => {
     api
-      .patch(`http://127.0.0.1:8000/api/contracts/${contractId}/status/`, {
-        status,
-      })
+      .patch(`http://127.0.0.1:8000/api/contracts/${contractId}/status/`, { status })
       .then(() => loadContracts())
       .catch(() => alert("Failed to update contract status."));
   };
 
   return (
     <>
-      {/* HEADER */}
-      <AppBar
-        position="static"
-        sx={{
-          background: "linear-gradient(90deg, #0F2E35 0%, #2F6F78 100%)",
-          boxShadow: "none",
-        }}
-      >
+      <AppBar position="static" elevation={0} sx={{ background: "#0B2228" }}>
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <IconButton color="inherit" onClick={() => navigate("/dashboard")}>
               <ArrowBackIcon />
             </IconButton>
-            <Typography variant="h6" sx={{ fontWeight: "bold", color: "#EAF6F7" }}>
-              Contracts
+            <Typography variant="h6" sx={{ fontWeight: "bold", color: "#5E9FA6" }}>
+              My Contracts
             </Typography>
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Avatar sx={{ bgcolor: "#5E9FA6", width: 40, height: 40 }}>
-              {avatarLetter}
-            </Avatar>
+            <Avatar sx={{ bgcolor: "#5E9FA6" }}>{avatarLetter}</Avatar>
             <Box>
-              <Typography sx={{ color: "#EAF6F7" }}>
-                {user?.username || "User"}
-              </Typography>
+              <Typography sx={{ color: "#EAF6F7" }}>{user?.username}</Typography>
               <Typography variant="caption" sx={{ color: "#A0C4C9" }}>
-                {user?.role
-                  ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
-                  : "Role"}
+                {user?.role?.toUpperCase()}
               </Typography>
             </Box>
           </Box>
         </Toolbar>
       </AppBar>
 
-      <Box sx={{ minHeight: "calc(100vh - 64px)", p: 4, bgcolor: "#0F2E35" }}>
-        {/* CLIENT: CREATE CONTRACT */}
+      <Box
+        sx={{
+          minHeight: "calc(100vh - 64px)",
+          background: "linear-gradient(135deg, #0F2E35, #2F6F78)",
+          p: 4,
+        }}
+      >
+        {/* CLIENT: CREATE CONTRACT SECTION */}
         {isClient && (
-          <>
-            <Typography
-              variant="h5"
-              sx={{ color: "#EAF6F7", mb: 3, fontWeight: "bold" }}
-            >
-              Create Contract from Accepted Proposal
-            </Typography>
+          <Card sx={{ mb: 5, borderRadius: 3, background: "rgba(15,46,53,0.9)" }}>
+            <CardContent sx={{ p: 4 }}>
+              <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ color: "#EAF6F7" }}>
+                Create Contract
+              </Typography>
+              <Typography variant="body2" color="#A0C4C9" mb={3}>
+                Create a contract from an accepted proposal
+              </Typography>
 
-            {loading ? (
-              <Typography sx={{ color: "#A0C4C9" }}>
-                Loading accepted proposals...
-              </Typography>
-            ) : acceptedProposals.length === 0 ? (
-              <Typography sx={{ color: "#A0C4C9", mb: 4 }}>
-                No accepted proposals available.
-              </Typography>
-            ) : (
-              <Box sx={{ display: "flex", gap: 2, mb: 4, alignItems: "end" }}>
-                <FormControl sx={{ minWidth: 400 }}>
-                  <InputLabel sx={{ color: "#A0C4C9" }}>
-                    Select Proposal
-                  </InputLabel>
-                  <Select
-                    value={selectedProposal}
-                    onChange={(e) => setSelectedProposal(e.target.value)}
+              {loading ? (
+                <Typography color="#A0C4C9">Loading accepted proposals...</Typography>
+              ) : acceptedProposals.length === 0 ? (
+                <Typography color="#A0C4C9">No accepted proposals available.</Typography>
+              ) : (
+                <Box sx={{ display: "flex", gap: 2, alignItems: "end" }}>
+                  <FormControl fullWidth>
+                    <InputLabel sx={{ color: "#A0C4C9" }}>Select Proposal</InputLabel>
+                    <Select
+                      value={selectedProposal}
+                      onChange={(e) => setSelectedProposal(e.target.value)}
+                      sx={{
+                        color: "#EAF6F7",
+                        ".MuiOutlinedInput-notchedOutline": { borderColor: "#5E9FA6" },
+                        "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#7ABAC6" },
+                      }}
+                    >
+                      {acceptedProposals.map((proposal) => (
+                        <MenuItem key={proposal.id} value={proposal.id}>
+                          {proposal.project_title} – {proposal.freelancer_username} (₹{proposal.proposed_rate})
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  <Button
+                    variant="contained"
+                    onClick={createContract}
+                    disabled={!selectedProposal}
                     sx={{
-                      color: "#EAF6F7",
-                      ".MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#5E9FA6",
-                      },
+                      px: 4,
+                      py: 1.5,
+                      backgroundColor: "#5E9FA6",
+                      "&:hover": { backgroundColor: "#2F6F78" },
                     }}
                   >
-                    {acceptedProposals.map((proposal) => (
-                      <MenuItem key={proposal.id} value={proposal.id}>
-                        {proposal.project_title} – Freelancer:{" "}
-                        {proposal.freelancer_username} (₹
-                        {proposal.proposed_rate})
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                <Button
-                  variant="contained"
-                  onClick={createContract}
-                  disabled={!selectedProposal}
-                  sx={{
-                    backgroundColor: "#5E9FA6",
-                    "&:hover": { backgroundColor: "#2F6F78" },
-                    px: 4,
-                    py: 1.5,
-                  }}
-                >
-                  CREATE CONTRACT
-                </Button>
-              </Box>
-            )}
-          </>
+                    Create
+                  </Button>
+                </Box>
+              )}
+            </CardContent>
+          </Card>
         )}
 
-        {/* CONTRACT LIST */}
-        <Typography
-          variant="h5"
-          sx={{ color: "#EAF6F7", mb: 3, fontWeight: "bold" }}
-        >
+        <Typography variant="h5" fontWeight="bold" sx={{ color: "#EAF6F7", mb: 3 }}>
           My Contracts
         </Typography>
 
         {contracts.length === 0 ? (
-          <Typography sx={{ color: "#A0C4C9" }}>
-            No contracts found.
-          </Typography>
+          <Typography color="#A0C4C9">No contracts found.</Typography>
         ) : (
           <Grid container spacing={4}>
             {contracts.map((contract) => {
-              const projectTitle =
-                contract.project_title ||
-                contract.project?.title ||
-                "Untitled Project";
-
+              const projectTitle = contract.project_title || contract.project?.title || "Untitled Project";
               const status = (contract.status || "pending").toLowerCase();
               const isActive = status === "active";
-              const freelancerId =
-                contract.freelancer_id ||
-                contract.proposal?.freelancer?.id;
 
               return (
                 <Grid item xs={12} md={6} key={contract.id}>
-                  <Card
-                    sx={{
-                      bgcolor: "rgba(15,46,53,0.8)",
-                      color: "#EAF6F7",
-                      borderRadius: 3,
-                    }}
-                  >
+                  <Card sx={{ height: "100%", borderRadius: 3, background: "rgba(15,46,53,0.85)" }}>
                     <CardContent>
-                      <Typography variant="h6" gutterBottom>
-                        Project: {projectTitle}
+                      <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: "#EAF6F7" }}>
+                        {projectTitle}
                       </Typography>
 
-                      <Typography variant="body1" sx={{ mb: 2 }}>
-                        Start Date:{" "}
-                        {contract.start_date
-                          ? new Date(
-                              contract.start_date
-                            ).toLocaleDateString()
-                          : "-"}
+                      <Typography variant="body2" color="#A0C4C9" mb={2}>
+                        Start Date: {contract.start_date ? new Date(contract.start_date).toLocaleDateString() : "-"}
                       </Typography>
 
                       <Chip
                         label={status.toUpperCase()}
-                        color={
-                          status === "completed"
-                            ? "primary"
-                            : status === "cancelled"
-                            ? "error"
-                            : "success"
-                        }
+                        color={status === "completed" ? "primary" : status === "cancelled" ? "error" : "success"}
                         sx={{ mb: 3 }}
                       />
 
                       {isActive && (
-                        <Box sx={{ display: "flex", gap: 2 }}>
+                        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 3 }}>
                           <Button
                             variant="contained"
-                            onClick={() =>
-                              navigate(`/messages?user_id=${freelancerId}`)
-                            }
-                            sx={{
-                              backgroundColor: "#5E9FA6",
-                              "&:hover": { backgroundColor: "#2F6F78" },
-                            }}
+                            onClick={() => navigate(`/messages?user_id=${contract.freelancer_id || contract.proposal?.freelancer?.id}`)}
+                            sx={{ backgroundColor: "#5E9FA6", "&:hover": { backgroundColor: "#2F6F78" } }}
                           >
                             Message
                           </Button>
 
                           <Button
                             variant="contained"
-                            onClick={() =>
-                              updateContractStatus(contract.id, "completed")
-                            }
-                            sx={{
-                              backgroundColor: "#4CAF50",
-                              "&:hover": { backgroundColor: "#388E3C" },
-                            }}
+                            onClick={() => updateContractStatus(contract.id, "completed")}
+                            sx={{ backgroundColor: "#4CAF50", "&:hover": { backgroundColor: "#388E3C" } }}
                           >
-                            Mark Completed
+                            Complete
                           </Button>
 
                           <Button
                             variant="contained"
-                            onClick={() =>
-                              updateContractStatus(contract.id, "cancelled")
-                            }
-                            sx={{
-                              backgroundColor: "#D32F2F",
-                              "&:hover": { backgroundColor: "#B71C1C" },
-                            }}
+                            onClick={() => updateContractStatus(contract.id, "cancelled")}
+                            sx={{ backgroundColor: "#D32F2F", "&:hover": { backgroundColor: "#B71C1C" } }}
                           >
                             Cancel
                           </Button>
                         </Box>
+                      )}
+
+                      {/* ================= REVIEW SECTION ================= */}
+                      {status === "completed" && (
+                        <ReviewForm
+                          contractId={contract.id}
+                          onReviewSubmitted={loadContracts}
+                          submittedReview={contract.review}
+                        />
                       )}
                     </CardContent>
                   </Card>
@@ -337,3 +456,6 @@ const ContractsPage = () => {
 };
 
 export default ContractsPage;
+
+
+

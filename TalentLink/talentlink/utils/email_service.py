@@ -4,22 +4,9 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
 def send_email_notification(to_email, subject, html_content, from_email=None):
-    """
-    Send an email using Django's send_mail (backend agnostic)
-    
-    Args:
-        to_email (str): Recipient email address
-        subject (str): Email subject
-        html_content (str): HTML content of the email
-        from_email (str, optional): Sender email address. Defaults to settings.DEFAULT_FROM_EMAIL
-    
-    Returns:
-        dict: {'id': 'sent_via_smtp'} if successful, None if failed
-    """
     if not from_email:
         from_email = settings.DEFAULT_FROM_EMAIL
     
-    # Check if using Gmail API or HTTPS-based backends (no SMTP validation needed)
     email_backend = getattr(settings, 'EMAIL_BACKEND', '')
     if 'SmartGmailBackend' in email_backend or 'FastGmailBackend' in email_backend or 'GmailAPIBackend' in email_backend:
         print(f"🚀 HTTPS email backend detected - sending via configured service to {to_email}")
@@ -39,7 +26,6 @@ def send_email_notification(to_email, subject, html_content, from_email=None):
             print(f"⚠️ HTTPS backend: Email delivery failed for {to_email} - {type(e).__name__}: {str(e)}")
             return {'id': 'smart_gmail_backend_failed', 'error': str(e)}
     
-    # Validate email configuration only for traditional SMTP backends
     if 'smtp' in email_backend.lower():
         if not settings.EMAIL_HOST or not settings.EMAIL_HOST_USER or not settings.EMAIL_HOST_PASSWORD:
             print(f"Email configuration error: Missing SMTP settings for {to_email}")
@@ -67,13 +53,11 @@ def send_email_notification(to_email, subject, html_content, from_email=None):
             
     except Exception as e:
         print(f"❌ Error sending email to {to_email}: {type(e).__name__}: {str(e)}")
-        # Log more details in production
         if not settings.DEBUG:
             print(f"Email config - HOST: {settings.EMAIL_HOST}, USER: {settings.EMAIL_HOST_USER}")
         return None
 
 def send_proposal_submitted_email(client_email, project_title, freelancer_name):
-    """Send email notification when freelancer submits proposal"""
     subject = f"New Proposal for {project_title}"
     html_content = f"""
     <html>
@@ -95,7 +79,6 @@ def send_proposal_submitted_email(client_email, project_title, freelancer_name):
     return send_email_notification(client_email, subject, html_content)
 
 def send_proposal_accepted_email(freelancer_email, project_title):
-    """Send email notification when client accepts proposal"""
     subject = f"Proposal Accepted for {project_title}"
     html_content = f"""
     <html>
@@ -117,7 +100,6 @@ def send_proposal_accepted_email(freelancer_email, project_title):
     return send_email_notification(freelancer_email, subject, html_content)
 
 def send_new_message_email(recipient_email, sender_name, message_preview, has_file=False, file_name=None):
-    """Send email notification when a new message is received"""
     subject = f"New Message from {sender_name}"
     
     print(f"📧 Preparing to send new message email to {recipient_email} from {sender_name}")
@@ -165,7 +147,6 @@ def send_new_message_email(recipient_email, sender_name, message_preview, has_fi
     return result
 
 def send_proposal_rejected_email(freelancer_email, project_title):
-    """Send email notification when client rejects proposal"""
     subject = f"Proposal Update for {project_title}"
     html_content = f"""
     <html>

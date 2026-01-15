@@ -324,7 +324,7 @@ const Home = () => {
               © 2026 TalentLink. All rights reserved.
             </p>
             <p className="text-sm text-gray-500">
-              Developed by <span className="text-blue-400 font-semibold">P. Dhanush Reddy</span>
+               <span className="text-blue-400 font-semibold"></span>
             </p>
           </motion.div>
         </div>

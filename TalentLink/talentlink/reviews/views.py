@@ -21,7 +21,6 @@ class ReviewCreateView(generics.CreateAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Get the contract
         try:
             contract = Contract.objects.get(id=contract_id)
         except Contract.DoesNotExist:
@@ -30,28 +29,24 @@ class ReviewCreateView(generics.CreateAPIView):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        # Check if the user is the client in this contract
         if request.user != contract.client:
             return Response(
                 {'error': 'Only clients can review freelancers'}, 
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # Check if the contract is completed
         if contract.status != 'completed':
             return Response(
                 {'error': 'Can only review completed contracts'}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Check if a review already exists for this contract
         if Review.objects.filter(contract=contract).exists():
             return Response(
                 {'error': 'A review already exists for this contract'}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Create the review with the freelancer as the reviewee
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(reviewer=request.user)
@@ -64,8 +59,6 @@ class ReviewListView(generics.ListAPIView):
     
     def get_queryset(self):
         user = self.request.user
-        # Show reviews where user is the client (reviews they wrote) 
-        # OR reviews where user is the freelancer (reviews they received)
         return Review.objects.filter(
             Q(contract__client=user) | Q(contract__freelancer=user)
         ).select_related('contract', 'reviewer').order_by('-review_date')
@@ -76,7 +69,6 @@ class UserReviewListView(generics.ListAPIView):
     
     def get_queryset(self):
         user_id = self.kwargs.get('user_id')
-        # Only show reviews where the user is the freelancer (since only clients can review freelancers)
         return Review.objects.filter(
             contract__freelancer_id=user_id
         ).select_related('contract', 'reviewer').order_by('-review_date')
@@ -88,7 +80,6 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
     
     def get_object(self):
         obj = super().get_object()
-        # Only allow reviewer to update/delete their own review
         if self.request.method in ['PUT', 'PATCH', 'DELETE']:
             if obj.reviewer != self.request.user:
                 from rest_framework.exceptions import PermissionDenied
@@ -112,7 +103,6 @@ class ReviewStatsView(generics.RetrieveAPIView):
             total_reviews=Count('id')
         )
         
-        # Get rating distribution
         rating_distribution = {}
         for rating in range(1, 6):
             count = reviews.filter(rating=rating).count()
@@ -131,7 +121,6 @@ class ReviewableContractsView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         
-        # Only show completed contracts where user is the client (can review the freelancer)
         completed_contracts = Contract.objects.filter(
             status='completed',
             client=user
@@ -139,13 +128,11 @@ class ReviewableContractsView(generics.ListAPIView):
         
         reviewable_contracts = []
         for contract in completed_contracts:
-            # Check if user has already reviewed this contract
             existing_review = Review.objects.filter(
                 contract=contract,
                 reviewer=user
             ).first()
             
-            # The other party is always the freelancer (since user is client)
             other_party = contract.freelancer
             
             reviewable_contracts.append({
@@ -167,12 +154,10 @@ class ContractReviewDetailView(generics.RetrieveAPIView):
         contract_id = self.kwargs.get('contract_id')
         contract = get_object_or_404(Contract, id=contract_id)
         
-        # Check if user is a participant in the contract
         if self.request.user not in [contract.client, contract.freelancer]:
             from rest_framework.exceptions import PermissionDenied
             raise PermissionDenied("You can only view reviews for contracts you're involved in.")
         
-        # Get the review for this contract from the current user
         review = Review.objects.filter(
             contract=contract,
             reviewer=self.request.user

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { contractAPI } from '../services/contractService';
 import { CalendarIcon, ClockIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { useAuth } from '../contexts/AuthContext';
 
 const Calendar = () => {
+  const { user } = useAuth();
   const [contracts, setContracts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,7 +22,6 @@ const Calendar = () => {
         c => (c.status === 'active' || c.status === 'draft') && c.end_date
       );
       
-      // Sort by end date (soonest first)
       activeContracts.sort((a, b) => new Date(a.end_date) - new Date(b.end_date));
       
       setContracts(activeContracts);
@@ -41,10 +42,10 @@ const Calendar = () => {
   };
 
   const getUrgencyColor = (days) => {
-    if (days < 0) return 'bg-red-50 border-red-200 text-red-700'; // Overdue
-    if (days <= 3) return 'bg-orange-50 border-orange-200 text-orange-700'; // Urgent
-    if (days <= 7) return 'bg-yellow-50 border-yellow-200 text-yellow-700'; // Warning
-    return 'bg-white border-gray-100 text-gray-700'; // Normal
+    if (days < 0) return 'bg-red-50 border-red-200 text-red-700';
+    if (days <= 3) return 'bg-orange-50 border-orange-200 text-orange-700';
+    if (days <= 7) return 'bg-yellow-50 border-yellow-200 text-yellow-700';
+    return 'bg-white border-gray-100 text-gray-700';
   };
 
   if (loading) {
@@ -58,8 +59,15 @@ const Calendar = () => {
   return (
     <div className="w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-6 lg:py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Calendar & Deadlines</h1>
-        <p className="text-gray-500 mt-2">Track your contract deadlines and remaining time</p>
+        <h1 className="text-3xl font-bold text-gray-900">
+          {user?.role === 'freelancer' ? 'Freelancer Calendar & Deadlines' : 'Calendar & Deadlines'}
+        </h1>
+        <p className="text-gray-500 mt-2">
+          {user?.role === 'freelancer' 
+            ? 'Track your contract deadlines, progress, and payments' 
+            : 'Track your contract deadlines and remaining time'
+          }
+        </p>
       </div>
 
       {error && (
@@ -71,8 +79,15 @@ const Calendar = () => {
       {contracts.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
           <CalendarIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No Upcoming Deadlines</h3>
-          <p className="text-gray-500">You don't have any active contracts with deadlines.</p>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            {user?.role === 'freelancer' ? 'No Active Contracts' : 'No Upcoming Deadlines'}
+          </h3>
+          <p className="text-gray-500">
+            {user?.role === 'freelancer' 
+              ? "You don't have any active contracts with deadlines. Start bidding on projects to get contracts." 
+              : "You don't have any active contracts with deadlines."
+            }
+          </p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -100,6 +115,25 @@ const Calendar = () => {
                         <CalendarIcon className="h-4 w-4" />
                         <span>Deadline: {new Date(contract.end_date).toLocaleDateString()}</span>
                     </div>
+                    {contract.client_name && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-gray-500">Client: {contract.client_name}</span>
+                      </div>
+                    )}
+                    {contract.agreed_amount && (
+                      <div className="flex items-center gap-1">
+                        <span className="font-medium text-green-600">
+                          ₹{parseFloat(contract.agreed_amount).toLocaleString()}
+                        </span>
+                      </div>
+                    )}
+                    {contract.progress !== null && contract.progress !== undefined && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-blue-600 font-medium">
+                          Progress: {contract.progress}%
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
 

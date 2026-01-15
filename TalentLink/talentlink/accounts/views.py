@@ -71,11 +71,9 @@ class ProfileUpdateView(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         try:
-            # Get the serializer and validate
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             
-            # Perform the update
             response = super().update(request, *args, **kwargs)
             return response
         except Exception as e:
@@ -122,7 +120,6 @@ class PublicProfileView(generics.RetrieveAPIView):
         try:
             return Profile.objects.get(user_id=user_id)
         except Profile.DoesNotExist:
-            # Create profile if it doesn't exist
             user = generics.get_object_or_404(User, id=user_id)
             return Profile.objects.create(user=user, name=user.username)
 
@@ -190,9 +187,7 @@ class DebugEmailView(APIView):
         host = getattr(settings, 'EMAIL_HOST', 'smtp.gmail.com')
         port = int(getattr(settings, 'EMAIL_PORT', 587))
 
-        # Check DNS Resolution
         try:
-            # Getaddrinfo to see what IPs we get (IPv4 and IPv6)
             addr_info = socket.getaddrinfo(host, port, proto=socket.IPPROTO_TCP)
             ips = [x[4][0] for x in addr_info]
             report["dns"]["resolved_ips"] = ips
@@ -201,7 +196,6 @@ class DebugEmailView(APIView):
             report["dns"]["status"] = "failed"
             report["dns"]["error"] = str(e)
 
-        # Check connectivity (skip for SmartGmailBackend - NO TIMEOUTS!)
         email_backend = getattr(settings, 'EMAIL_BACKEND', '')
         if 'SmartGmailBackend' in email_backend:
             report["connectivity"]["status"] = "success"
@@ -210,9 +204,7 @@ class DebugEmailView(APIView):
             report["connectivity"]["status"] = "success"
             report["connectivity"]["message"] = "Real Gmail backend uses SMTP relay via HTTPS"
         else:
-            # Check connectivity (Force IPv4) for SMTP backends
             try:
-                # Resolve IPv4 explicitly
                 ipv4_info = socket.getaddrinfo(host, port, family=socket.AF_INET, proto=socket.IPPROTO_TCP)
                 ipv4_host = ipv4_info[0][4][0]
                 
@@ -225,10 +217,8 @@ class DebugEmailView(APIView):
                 report["connectivity"]["error"] = f"IPv4 Connection failed: {str(e)}"
                 return Response(report, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # Try sending (Actually test SmartGmailBackend)
         try:
             if 'SmartGmailBackend' in email_backend:
-                # Actually test SmartGmailBackend - don't bypass it
                 print(f"🧪 DEBUG VIEW: Testing SmartGmailBackend with email to {email}")
                 result = send_mail(
                     subject='Test Email from TalentLink Debug',
@@ -257,7 +247,6 @@ class DebugEmailView(APIView):
         return Response(report)
 
 class SmartGmailDebugView(APIView):
-    """Debug endpoint to check SmartGmailBackend environment detection"""
     permission_classes = [permissions.AllowAny]
     
     def get(self, request):
@@ -265,11 +254,9 @@ class SmartGmailDebugView(APIView):
             from utils.smart_gmail_backend import SmartGmailBackend
             backend = SmartGmailBackend()
             
-            # Check environment detection
             is_production = backend._is_production_environment()
             env_info = backend.get_environment_info()
             
-            # Check settings
             email_backend = getattr(settings, 'EMAIL_BACKEND', '')
             debug = getattr(settings, 'DEBUG', None)
             
@@ -298,3 +285,37 @@ class SmartGmailDebugView(APIView):
                 "error": str(e),
                 "traceback": str(__import__('traceback').format_exc())
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ChangePasswordView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def post(self, request, *args, **kwargs):
+        from django.contrib.auth import authenticate
+        
+        current_password = request.data.get('current_password')
+        new_password = request.data.get('new_password')
+        
+        if not current_password or not new_password:
+            return Response({
+                'error': 'Both current_password and new_password are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if len(new_password) < 8:
+            return Response({
+                'error': 'New password must be at least 8 characters long'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Verify current password
+        user = authenticate(username=request.user.username, password=current_password)
+        if not user:
+            return Response({
+                'error': 'Current password is incorrect'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Change the password
+        request.user.set_password(new_password)
+        request.user.save()
+        
+        return Response({
+            'message': 'Password changed successfully'
+        }, status=status.HTTP_200_OK)

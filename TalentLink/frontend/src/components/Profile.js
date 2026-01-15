@@ -414,7 +414,7 @@ function Profile() {
                     {authUser?.role === 'freelancer' && profile?.hourly_rate && (
                       <div className="flex items-center space-x-2">
                         <CurrencyDollarIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-                        <span className="font-semibold text-sm sm:text-base">${profile.hourly_rate}/hr</span>
+                        <span className="font-semibold text-sm sm:text-base">₹{profile.hourly_rate}/hr</span>
                       </div>
                     )}
                   </div>
@@ -554,7 +554,7 @@ function Profile() {
                           <CurrencyDollarIcon className="h-4 w-4 mr-2 text-green-600" />
                           Hourly Rate
                         </span>
-                        <span className="text-lg font-bold text-gray-900">${profile.hourly_rate}</span>
+                        <span className="text-lg font-bold text-gray-900">₹{profile.hourly_rate}</span>
                       </div>
                       <div className="mt-2 bg-green-100 rounded-full h-2">
                         <div className="bg-green-600 h-2 rounded-full" style={{width: '75%'}}></div>
@@ -667,7 +667,7 @@ function Profile() {
                         </h4>
                         <div className="bg-green-50 rounded-lg p-4 border border-green-200">
                           <p className="text-2xl font-bold text-green-700">
-                            ${profile.hourly_rate || '0.00'} per hour
+                            ₹{profile.hourly_rate || '0.00'} per hour
                           </p>
                         </div>
                       </div>
@@ -1128,7 +1128,7 @@ function Profile() {
                             }`}>
                               <div className={`text-3xl font-bold ${
                                 darkMode ? 'text-green-400' : 'text-green-600'
-                              }`}>${profile.hourly_rate}</div>
+                              }`}>₹{profile.hourly_rate}</div>
                               <div className={`text-sm mt-1 ${
                                 darkMode ? 'text-gray-400' : 'text-gray-600'
                               }`}>per hour</div>

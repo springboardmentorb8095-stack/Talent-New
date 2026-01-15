@@ -3,7 +3,6 @@ from django.conf import settings
 from contracts.models import Contract
 
 class Conversation(models.Model):
-    """A conversation between client and freelancer for a specific contract"""
     contract = models.OneToOneField(Contract, on_delete=models.CASCADE, related_name='conversation')
     participants = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='conversations')
     is_active = models.BooleanField(default=True)
@@ -38,7 +37,6 @@ class Message(models.Model):
     file_url = models.URLField(blank=True, null=True)
     file_name = models.CharField(max_length=255, blank=True)
     
-    # Contract-related fields
     contract_action = models.CharField(max_length=50, blank=True, help_text="Action related to contract (e.g., 'signed', 'status_changed')")
     contract_data = models.JSONField(default=dict, blank=True)
     
@@ -64,7 +62,6 @@ class Message(models.Model):
             self.save(update_fields=['is_read', 'read_at'])
 
 class MessageReadReceipt(models.Model):
-    """Track read receipts for messages"""
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='read_receipts')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     read_at = models.DateTimeField(auto_now_add=True)

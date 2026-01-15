@@ -34,11 +34,43 @@ body {
 /* Ensure proper viewport handling */
 html {
   height: 100%;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   min-height: 100vh;
   min-height: -webkit-fill-available;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Prevent zoom on input fields for mobile devices */
+input, textarea, select {
+  font-size: 16px !important;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* iOS specific fixes */
+@supports (-webkit-touch-callout: none) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
+
+/* Mobile-specific input fixes */
+@media screen and (max-width: 768px) {
+  input, textarea, select {
+    font-size: 16px !important;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  
+  /* Ensure proper scaling */
+  * {
+    -webkit-text-size-adjust: none;
+  }
 }
 
 code {

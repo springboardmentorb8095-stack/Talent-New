@@ -90,7 +90,7 @@ const Dashboard = () => {
   const stats = [
     { 
       title: 'This Month Revenue', 
-      value: '$13,596', 
+      value: '₹13,596', 
       change: '+1.2%', 
       isPositive: true,
       icon: BanknotesIcon,
@@ -134,10 +134,10 @@ const Dashboard = () => {
   ];
 
   const transactions = [
-    { id: '#INV-001', client: 'Stark Tech', date: 'Nov 28, 2025', amount: '$1,200', status: 'Paid', statusColor: 'text-green-600 bg-green-50' },
-    { id: '#INV-002', client: 'Global Mart', date: 'Nov 25, 2025', amount: '$850', status: 'Pending', statusColor: 'text-yellow-600 bg-yellow-50' },
-    { id: '#INV-003', client: 'Nova Labs', date: 'Nov 22, 2025', amount: '$2,300', status: 'Paid', statusColor: 'text-green-600 bg-green-50' },
-    { id: '#INV-004', client: 'Acme Corp', date: 'Nov 20, 2025', amount: '$450', status: 'Failed', statusColor: 'text-red-600 bg-red-50' },
+    { id: '#INV-001', client: 'Stark Tech', date: 'Nov 28, 2025', amount: '₹1,200', status: 'Paid', statusColor: 'text-green-600 bg-green-50' },
+    { id: '#INV-002', client: 'Global Mart', date: 'Nov 25, 2025', amount: '₹850', status: 'Pending', statusColor: 'text-yellow-600 bg-yellow-50' },
+    { id: '#INV-003', client: 'Nova Labs', date: 'Nov 22, 2025', amount: '₹2,300', status: 'Paid', statusColor: 'text-green-600 bg-green-50' },
+    { id: '#INV-004', client: 'Acme Corp', date: 'Nov 20, 2025', amount: '₹450', status: 'Failed', statusColor: 'text-red-600 bg-red-50' },
   ];
 
 

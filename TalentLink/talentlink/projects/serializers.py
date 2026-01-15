@@ -11,6 +11,7 @@ class SkillSerializer(serializers.ModelSerializer):
 
 class ProjectSerializer(serializers.ModelSerializer):
     client = serializers.StringRelatedField(read_only=True)
+    client_details = serializers.SerializerMethodField()
     skills_required = SkillSerializer(many=True, read_only=True)
     skills_required_ids = serializers.ListField(
         child=serializers.IntegerField(),
@@ -20,7 +21,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Project
-        fields = ['id', 'client', 'title', 'description', 'budget', 'duration', 'skills_required', 'skills_required_ids', 'status', 'created_at']
+        fields = ['id', 'client', 'client_details', 'title', 'description', 'budget', 'duration', 'skills_required', 'skills_required_ids', 'status', 'created_at']
         read_only_fields = ['id', 'client', 'status', 'created_at']
 
     def create(self, validated_data):
@@ -38,6 +39,37 @@ class ProjectSerializer(serializers.ModelSerializer):
         if skills_ids is not None:
             instance.skills_required.set(skills_ids)
         return instance
+
+    def get_client_details(self, obj):
+        """Get detailed client information including profile"""
+        try:
+            profile = obj.client.profile
+            return {
+                'id': obj.client.id,
+                'username': obj.client.username,
+                'first_name': obj.client.first_name,
+                'last_name': obj.client.last_name,
+                'email': obj.client.email,
+                'profile': {
+                    'name': profile.name,
+                    'bio': profile.bio,
+                    'hourly_rate': str(profile.hourly_rate) if profile.hourly_rate else None,
+                    'experience': profile.experience,
+                    'portfolio': profile.portfolio,
+                    'skills': [skill.name for skill in profile.skills.all()],
+                    'availability': profile.availability,
+                    'avatar': profile.avatar.url if profile.avatar else None
+                }
+            }
+        except AttributeError:
+            return {
+                'id': obj.client.id,
+                'username': obj.client.username,
+                'first_name': obj.client.first_name,
+                'last_name': obj.client.last_name,
+                'email': obj.client.email,
+                'profile': None
+            }
 
 class ProposalSerializer(serializers.ModelSerializer):
     freelancer = serializers.StringRelatedField(read_only=True)

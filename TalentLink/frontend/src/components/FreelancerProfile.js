@@ -4,7 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { userAPI, authAPI } from '../api';
 import { 
   XMarkIcon,
-  EnvelopeIcon
+  EnvelopeIcon,
+  CurrencyDollarIcon
 } from '@heroicons/react/24/outline';
 
 const FreelancerProfile = () => {
@@ -126,9 +127,10 @@ const FreelancerProfile = () => {
                 <p className="text-gray-600">
                   @{freelancer.user?.username}
                 </p>
-                <p className="text-lg text-gray-700 mt-2">
-                  ${hourlyRate}/hr
-                </p>
+                <div className="flex items-center gap-2 text-lg text-gray-700 mt-2">
+                  <CurrencyDollarIcon className="h-5 w-5" />
+                  <span>₹{hourlyRate}/hr</span>
+                </div>
                 {freelancer.user?.email && (
                   <div className="mt-2 flex items-center gap-2 text-gray-700">
                     <EnvelopeIcon className="h-4 w-4" />

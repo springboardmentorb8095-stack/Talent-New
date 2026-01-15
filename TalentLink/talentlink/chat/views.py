@@ -31,7 +31,6 @@ class ConversationViewSet(ModelViewSet):
         return Conversation.objects.filter(participants=user, is_active=True)
     
     def create(self, request, *args, **kwargs):
-        """Create a conversation for a contract"""
         contract_id = request.data.get('contract_id')
         if not contract_id:
             return Response(
@@ -54,7 +53,6 @@ class ConversationViewSet(ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # Check if conversation already exists
         if hasattr(contract, 'conversation'):
             serializer = ConversationSerializer(contract.conversation)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -63,7 +61,6 @@ class ConversationViewSet(ModelViewSet):
             conversation = Conversation.objects.create(contract=contract)
             conversation.participants.add(contract.client, contract.freelancer)
             
-            # Create system message
             Message.objects.create(
                 conversation=conversation,
                 sender=request.user,
@@ -76,10 +73,8 @@ class ConversationViewSet(ModelViewSet):
     
     @action(detail=True, methods=['get'])
     def messages(self, request, pk=None):
-        """Get messages for a conversation"""
         conversation = self.get_object()
         
-        # Check if user is a participant
         if request.user not in conversation.participants.all():
             return Response(
                 {"error": "You are not a participant in this conversation"}, 
@@ -89,7 +84,6 @@ class ConversationViewSet(ModelViewSet):
         messages = conversation.messages.all().order_by('created_at')
         serializer = MessageSerializer(messages, many=True, context={'request': request})
         
-        # Mark messages as read
         unread_messages = messages.filter(is_read=False).exclude(sender=request.user)
         for message in unread_messages:
             message.mark_as_read()
@@ -113,22 +107,17 @@ class ConversationViewSet(ModelViewSet):
         
         message = serializer.save(conversation=conversation, sender=request.user)
         
-        # Update conversation updated_at
-        conversation.save()  # This will update the updated_at field
+        conversation.save()
         
         print(f"📤 Message {message.id} sent by {request.user.username} in conversation {conversation.id}")
         
         import threading
 
-        # Notify other participants asynchronously to prevent blocking the response
         def notify_participants(conversation_id, sender_username, message_text, message_type, file_name, sender_id):
             try:
-                # Re-fetch conversation to ensure we have fresh data in the new thread
                 from .models import Conversation
                 from accounts.models import Notification
                 
-                # We need to manually close the connection if it's a new thread to avoid leaks, 
-                # but Django usually handles this. Safe side: just use standard ORM.
                 conversation = Conversation.objects.get(id=conversation_id)
                 other_participants = conversation.participants.exclude(id=sender_id)
                 
@@ -162,7 +151,6 @@ class ConversationViewSet(ModelViewSet):
             except Exception as e:
                 print(f"❌ [Async] Error in notify_participants: {str(e)}")
 
-        # Start the notification thread
         thread = threading.Thread(
             target=notify_participants,
             args=(
@@ -181,17 +169,14 @@ class ConversationViewSet(ModelViewSet):
     
     @action(detail=True, methods=['post'])
     def clear_chat(self, request, pk=None):
-        """Clear all messages in a conversation"""
         conversation = self.get_object()
         
-        # Check if user is a participant
         if request.user not in conversation.participants.all():
             return Response(
                 {"error": "You are not a participant in this conversation"}, 
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # Delete all messages in the conversation
         conversation.messages.all().delete()
         
         return Response(
@@ -277,9 +262,7 @@ class MessageViewSet(ModelViewSet):
         serializer = MessageSerializer(unread_messages, many=True, context={'request': request})
         return Response(serializer.data)
 
-# Long-polling endpoint for real-time messaging
 class MessagePollView(generics.ListAPIView):
-    """Long-polling endpoint for real-time messaging"""
     permission_classes = [IsAuthenticated]
     serializer_class = MessageSerializer
     
@@ -295,16 +278,14 @@ class MessagePollView(generics.ListAPIView):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        # Check if user is a participant
         if request.user not in conversation.participants.all():
             return Response(
                 {"error": "You are not a participant in this conversation"}, 
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # Wait for new messages (simple implementation)
         import time
-        timeout = 30  # 30 seconds timeout
+        timeout = 30
         start_time = time.time()
         
         while time.time() - start_time < timeout:

@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     RegisterView, LoginView, ProfileView, ProfileUpdateView, UserUpdateView, UserListView, UserDetailView,
     UserByUsernameView, NotificationListView, NotificationDetailView, NotificationMarkAsReadView, UnreadNotificationCountView,
-    SkillListView, PublicProfileView, DebugEmailView, SmartGmailDebugView
+    SkillListView, PublicProfileView, DebugEmailView, SmartGmailDebugView, ChangePasswordView
 )
 
 urlpatterns = [
@@ -22,4 +22,5 @@ urlpatterns = [
     path('notifications/<int:pk>/mark-as-read/', NotificationMarkAsReadView.as_view(), name='notification-mark-as-read'),
     path('notifications/unread-count/', UnreadNotificationCountView.as_view(), name='unread-notification-count'),
     path('skills/', SkillListView.as_view(), name='skill-list'),
+    path('change-password/', ChangePasswordView.as_view(), name='change-password'),
 ]

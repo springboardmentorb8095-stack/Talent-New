@@ -6,7 +6,6 @@ import { useDarkMode } from '../contexts/DarkModeContext';
 import { messageVariants, chatContainerVariants, typingIndicatorVariants } from '../utils/animations';
 import { useScrollAnimation, useResponsiveAnimation, useReducedMotion } from '../hooks/useAnimations';
 
-// Custom CSS for WhatsApp-style animations
 const ChatStyles = () => (
   <style jsx>{`
     .bg-chat-bg {
@@ -62,12 +61,10 @@ const Chat = ({ contractId, isWidget = true, onBackClick }) => {
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
 
-  // Responsive animations
   const responsiveMessageVariants = useResponsiveAnimation('message');
   const responsiveButtonVariants = useResponsiveAnimation('button');
   const prefersReducedMotion = useReducedMotion();
   
-  // Use responsive variants or fall back to default message variants
   const finalMessageVariants = prefersReducedMotion ? {
     initial: { opacity: 0 },
     animate: { opacity: 1 },
@@ -77,34 +74,29 @@ const Chat = ({ contractId, isWidget = true, onBackClick }) => {
   const messagesContainerRef = useRef(null);
   const pollingIntervalRef = useRef(null);
   const typingTimeoutRef = useRef(null);
-  const messagesRef = useRef(messages); // Ref to store current messages for polling
-  const isMountedRef = useRef(false); // Track if component is mounted to prevent auto-submission
-  const isSendingRef = useRef(false); // Track if a message is currently being sent
-  const lastSendTimeRef = useRef(0); // Track last send time to prevent rapid submissions
-  const submitCountRef = useRef(0); // Track number of submit attempts for debugging
-  const isPollingRequestRef = useRef(false); // Track if a poll request is currently in progress
+  const messagesRef = useRef(messages);
+  const isMountedRef = useRef(false);
+  const isSendingRef = useRef(false);
+  const lastSendTimeRef = useRef(0);
+  const submitCountRef = useRef(0);
+  const isPollingRequestRef = useRef(false);
 
-  // Load conversations
   useEffect(() => {
-    // Reset current conversation when contractId changes
-    stopPolling(); // Stop any existing polling
+    stopPolling();
     setSelectedConversation(null);
     setMessages([]);
     setError(null);
     loadConversations();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractId]);
 
   useEffect(() => {
     scrollToBottom(false);
   }, [messages.length]);
 
-  // Keep messagesRef updated with current messages
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
 
-  // Set mounted flag after component is fully mounted
   useEffect(() => {
     const timer = setTimeout(() => {
       isMountedRef.current = true;
@@ -112,10 +104,8 @@ const Chat = ({ contractId, isWidget = true, onBackClick }) => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Start polling for new messages when conversation is selected
   useEffect(() => {
     if (selectedConversation) {
-      // Add a small delay to ensure conversation is fully loaded
       const pollingDelay = setTimeout(() => {
         startPolling();
       }, 1000);
@@ -136,7 +126,6 @@ const Chat = ({ contractId, isWidget = true, onBackClick }) => {
       const response = await conversationAPI.getConversations();
       setConversations(response.data);
       
-      // Auto-select conversation for the given contract
       if (contractId) {
         const contractConversation = response.data.find(
           conv => conv.contract === contractId
@@ -157,20 +146,16 @@ const Chat = ({ contractId, isWidget = true, onBackClick }) => {
     try {
       const response = await conversationAPI.getMessages(conversationId);
       
-      // Sort messages chronologically (oldest first)
       const sortedMessages = response.data.sort((a, b) => 
         new Date(a.created_at) - new Date(b.created_at)
       );
       
-      // Add status to messages
       const messagesWithStatus = sortedMessages.map(msg => ({
         ...msg,
         status: messageStatus[msg.id] || (msg.is_read ? 'read' : 'delivered')
       }));
       
-      // Only update if there are actual changes to prevent flickering
       setMessages(prevMessages => {
-        // Check if messages are actually different
         if (prevMessages.length === messagesWithStatus.length) {
           const areMessagesDifferent = messagesWithStatus.some((msg, index) => {
             const prevMsg = prevMessages[index];
@@ -178,7 +163,7 @@ const Chat = ({ contractId, isWidget = true, onBackClick }) => {
           });
           
           if (!areMessagesDifferent) {
-            return prevMessages; // No changes, keep existing state
+            return prevMessages;
           }
         }
         
@@ -204,36 +189,30 @@ const Chat = ({ contractId, isWidget = true, onBackClick }) => {
   const sendMessage = async (e, voiceNote = null) => {
     e.preventDefault();
     
-    // Check if user is authenticated
     if (!user || !user.id) {
       setError('You must be logged in to send messages');
       return;
     }
     
-    // Prevent message sending if component is not fully mounted
     if (!isMountedRef.current) {
       return;
     }
     
-    // Prevent multiple simultaneous message sends
     if (isSendingRef.current) {
       return;
     }
     
-    // Add debounce check - prevent messages sent within 2000ms of each other (2 seconds)
     const now = Date.now();
     if (now - lastSendTimeRef.current < 2000) {
       return;
     }
     lastSendTimeRef.current = now;
     
-    // Additional safety check - prevent empty messages
     const messageText = voiceNote ? voiceNote.text : newMessage.trim();
     if (!messageText || !selectedConversation || messageText.length === 0) {
       return;
     }
     
-    // Check for duplicate messages within the last 5 seconds
     const recentDuplicate = messagesRef.current.find(msg => 
       msg.text === messageText && 
       msg.is_mine && 
@@ -244,11 +223,9 @@ const Chat = ({ contractId, isWidget = true, onBackClick }) => {
       return;
     }
     
-    // Set sending flag to prevent multiple submissions
     isSendingRef.current = true;
-    setIsSending(true); // Update UI state
+    setIsSending(true);
     
-    // Safety timeout - reset sending state after 10 seconds in case something goes wrong
     const safetyTimeout = setTimeout(() => {
       if (isSendingRef.current) {
 
@@ -257,7 +234,6 @@ const Chat = ({ contractId, isWidget = true, onBackClick }) => {
       }
     }, 10000);
     
-    // Create temporary message for immediate UI feedback
     const tempMessage = {
       id: `temp-${Date.now()}`,
       text: messageText,
@@ -277,7 +253,6 @@ const Chat = ({ contractId, isWidget = true, onBackClick }) => {
       } : null
     };
 
-    // Add temporary message immediately and sort chronologically
     setMessages(prev => {
       const allMessages = [...prev, tempMessage];
       return allMessages.sort((a, b) => 
@@ -295,38 +270,30 @@ const Chat = ({ contractId, isWidget = true, onBackClick }) => {
         message_type: 'text'
       });
       
-      // Clear safety timeout
       clearTimeout(safetyTimeout);
       
-      // Reset sending flag
       isSendingRef.current = false;
-      setIsSending(false); // Update UI state
+      setIsSending(false);
       
-      // Replace temporary message with real one and sort chronologically
       setMessages(prev => {
-        // Check if the real message was already added (e.g. by polling)
         const alreadyExists = prev.some(msg => msg.id === response.data.id);
         
         if (alreadyExists) {
-          // If the real message exists, just remove the temporary one
           const filteredMessages = prev.filter(msg => msg.id !== tempMessage.id);
           return filteredMessages.sort((a, b) => 
             new Date(a.created_at) - new Date(b.created_at)
           );
         }
 
-        // Update the temporary message with the real one
         const updatedMessages = prev.map(msg => 
           msg.id === tempMessage.id ? { ...response.data, status: 'sent' } : msg
         );
         
-        // Ensure the message is properly sorted
         return updatedMessages.sort((a, b) => 
           new Date(a.created_at) - new Date(b.created_at)
         );
       });
       
-      // Also trigger an immediate poll to ensure consistency
       if (selectedConversation) {
         setTimeout(() => {
           loadMessages(selectedConversation.id);

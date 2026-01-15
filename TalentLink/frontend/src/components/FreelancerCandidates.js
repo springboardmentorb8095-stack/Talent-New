@@ -159,7 +159,7 @@ const FreelancerCandidates = () => {
                             </div>
                         )}
                         {profile.hourly_rate && (
-                            <p className="text-sm font-medium text-gray-700 mt-1">${profile.hourly_rate}/hr</p>
+                            <p className="text-sm font-medium text-gray-700 mt-1">₹{profile.hourly_rate}/hr</p>
                         )}
                         </div>
                     </div>
@@ -211,7 +211,7 @@ const FreelancerCandidates = () => {
                                     </span>
                                 </div>
                                 <div className="text-xs text-gray-500 mt-1">
-                                    Bid: ${proposal.bid_amount}
+                                    Bid: ₹{proposal.bid_amount}
                                 </div>
                             </Link>
                             ))}

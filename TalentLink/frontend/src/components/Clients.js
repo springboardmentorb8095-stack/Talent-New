@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { projectAPI } from '../api';
-import { UserCircleIcon, BriefcaseIcon } from '@heroicons/react/24/outline';
+import { BriefcaseIcon, ClockIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 
 const Clients = () => {
   const [clients, setClients] = useState([]);
+  const [filteredClients, setFilteredClients] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -12,34 +14,50 @@ const Clients = () => {
     fetchClients();
   }, []);
 
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredClients(clients);
+    } else {
+      const filtered = clients.filter(client =>
+        client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (client.email && client.email.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+      setFilteredClients(filtered);
+    }
+  }, [searchTerm, clients]);
+
   const fetchClients = async () => {
     try {
       setLoading(true);
-      // Since we don't have a direct users endpoint, we'll derive clients from projects
-      // In a real app, this should call /api/users/?role=client or similar
       const response = await projectAPI.getAll();
       const projects = response.data;
       
       const clientMap = new Map();
       
       projects.forEach(project => {
-        // Assuming project.client is a name string based on ProjectList.js
-        // If project.client_details object existed, we would use that
-        const clientName = project.client; 
+        const clientData = project.client_details || { username: project.client };
+        const clientKey = clientData.id || clientData.username;
         
-        if (!clientMap.has(clientName)) {
-          clientMap.set(clientName, {
-            name: clientName,
-            // Generate a consistent avatar color/placeholder based on name
-            avatarColor: stringToColor(clientName),
+        if (!clientMap.has(clientKey)) {
+          clientMap.set(clientKey, {
+            id: clientData.id,
+            name: clientData.profile?.name || clientData.username || (clientData.first_name + ' ' + clientData.last_name),
+            username: clientData.username,
+            email: clientData.email,
+            bio: clientData.profile?.bio,
+            avatar: clientData.profile?.avatar,
+            avatarColor: stringToColor(clientData.username || clientData.name || ''),
             projects: []
           });
         }
         
-        clientMap.get(clientName).projects.push(project);
+        clientMap.get(clientKey).projects.push(project);
       });
       
-      setClients(Array.from(clientMap.values()));
+      const clientsArray = Array.from(clientMap.values());
+      setClients(clientsArray);
+      setFilteredClients(clientsArray);
     } catch (err) {
       setError('Failed to load clients');
       console.error(err);
@@ -48,7 +66,6 @@ const Clients = () => {
     }
   };
 
-  // Helper to generate consistent colors
   const stringToColor = (str) => {
     const colors = [
       'bg-red-100 text-red-600',
@@ -80,6 +97,23 @@ const Clients = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Clients</h1>
         <p className="text-gray-500 mt-2">View client profiles and their active projects</p>
+        
+        <div className="mt-6">
+          <div className="relative max-w-md">
+            <input
+              type="text"
+              placeholder="Search clients by name, username, or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+            />
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
       </div>
 
       {error && (
@@ -89,19 +123,48 @@ const Clients = () => {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {clients.map((client, index) => (
-          <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+        {filteredClients.length === 0 && searchTerm.trim() !== '' ? (
+          <div className="col-span-full text-center py-12">
+            <p className="text-gray-500 text-lg">No clients found matching "{searchTerm}"</p>
+            <button 
+              onClick={() => setSearchTerm('')}
+              className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Clear search
+            </button>
+          </div>
+        ) : (
+          filteredClients.map((client, index) => (
+            <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
             <div className="p-6 border-b border-gray-50">
               <div className="flex items-center gap-4">
-                <div className={`h-16 w-16 rounded-full flex items-center justify-center text-xl font-bold ${client.avatarColor}`}>
-                  {client.name.charAt(0).toUpperCase()}
-                </div>
-                <div>
+                {client.avatar ? (
+                  <img 
+                    src={client.avatar} 
+                    alt={client.name}
+                    className="h-16 w-16 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className={`h-16 w-16 rounded-full flex items-center justify-center text-xl font-bold ${client.avatarColor}`}>
+                    {client.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="flex-1">
                   <h3 className="text-lg font-bold text-gray-900">{client.name}</h3>
                   <p className="text-sm text-gray-500">{client.projects.length} Projects</p>
+                  {client.email && (
+                    <p className="text-sm text-gray-400 mt-1">{client.email}</p>
+                  )}
                 </div>
               </div>
+              {client.bio && (
+                <div className="mt-4">
+                  <p className="text-sm text-gray-600 line-clamp-2">{client.bio}</p>
+                </div>
+              )}
             </div>
+            
+
             
             <div className="p-4 bg-gray-50/50">
               <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-2">Recent Projects</h4>
@@ -112,7 +175,7 @@ const Clients = () => {
                     to={`/projects/${project.id}`}
                     className="block p-3 rounded-lg bg-white border border-gray-100 hover:border-blue-300 transition-colors group"
                   >
-                    <div className="flex justify-between items-start">
+                    <div className="flex justify-between items-start mb-2">
                       <div className="font-medium text-gray-900 text-sm group-hover:text-blue-600 truncate flex-1 pr-2">
                         {project.title}
                       </div>
@@ -121,6 +184,16 @@ const Clients = () => {
                       }`}>
                         {project.status}
                       </span>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <div className="flex items-center gap-1">
+                        <CurrencyDollarIcon className="h-3 w-3" />
+                        <span>₹{project.budget}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <ClockIcon className="h-3 w-3" />
+                        <span>{project.duration}</span>
+                      </div>
                     </div>
                   </Link>
                 ))}
@@ -132,7 +205,8 @@ const Clients = () => {
               </div>
             </div>
           </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

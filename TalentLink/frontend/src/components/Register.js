@@ -207,7 +207,7 @@ const Register = () => {
                         name="first_name"
                         type="text"
                         required
-                        className="block w-full pl-10 pr-3 py-2.5 sm:py-3 bg-white/20 border border-white/10 rounded-lg placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm sm:text-sm backdrop-blur-sm"
+                        className="block w-full pl-10 pr-3 py-2.5 sm:py-3 bg-white/20 border border-white/10 rounded-lg placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base sm:text-sm backdrop-blur-sm"
                         placeholder="First Name"
                         value={formData.first_name}
                         onChange={handleChange}
@@ -234,7 +234,7 @@ const Register = () => {
                         name="last_name"
                         type="text"
                         required
-                        className="block w-full pl-10 pr-3 py-2.5 sm:py-3 bg-white/20 border border-white/10 rounded-lg placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm sm:text-sm backdrop-blur-sm"
+                        className="block w-full pl-10 pr-3 py-2.5 sm:py-3 bg-white/20 border border-white/10 rounded-lg placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base sm:text-sm backdrop-blur-sm"
                         placeholder="Last Name"
                         value={formData.last_name}
                         onChange={handleChange}

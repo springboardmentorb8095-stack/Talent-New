@@ -89,6 +89,7 @@ export const authAPI = {
   updateUser: (userData) => api.patch('/auth/user/update/', userData),
   getSkills: () => api.get('/auth/skills/'),
   createSkill: (skillData) => api.post('/auth/skills/', skillData),
+  changePassword: (passwordData) => api.post('/auth/change-password/', passwordData),
 };
 
 export const projectAPI = {

@@ -21,6 +21,12 @@ const ReviewsPage = () => {
     fetchReviewableContracts();
   }, []);
 
+  useEffect(() => {
+    if (user?.role === 'client') {
+      setActiveTab('given');
+    }
+  }, [user]);
+
   const fetchReviews = async () => {
     try {
       const response = await api.get('/reviews/');
@@ -77,11 +83,9 @@ const ReviewsPage = () => {
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-gray-200 rounded w-1/4"></div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="h-48 bg-gray-200 rounded"></div>
-              <div className="lg:col-span-2 space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-32 bg-gray-200 rounded"></div>
-                ))}
+              {user?.role === 'freelancer' && <div className="h-32 bg-gray-200 rounded"></div>}
+              <div className={user?.role === 'client' ? "lg:col-span-3" : "lg:col-span-2"}>
+                <div className="h-64 bg-gray-200 rounded"></div>
               </div>
             </div>
           </div>
@@ -94,123 +98,71 @@ const ReviewsPage = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Reviews & Ratings</h1>
-          <p className="text-gray-600">Manage your reviews and rate your completed contracts</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {user?.role === 'client' ? 'Your Reviews' : 'Reviews & Ratings'}
+          </h1>
+          <p className="text-gray-600">
+            {user?.role === 'client' 
+              ? 'View reviews you\'ve given and rate completed contracts' 
+              : 'Manage your reviews and rate your completed contracts'
+            }
+          </p>
         </div>
 
-        {reviewableContracts.length > 0 && user?.role === 'client' && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <ChatBubbleLeftRightIcon className="w-5 h-5 text-blue-600" />
-                <div>
-                  <p className="text-blue-900 font-medium">
-                    You have {reviewableContracts.length} contract{reviewableContracts.length !== 1 ? 's' : ''} to review
-                  </p>
-                  <p className="text-blue-700 text-sm">
-                    Rate your experience with completed contracts
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1">
-            <ReviewStats userId={null} />
-            
-            {reviewableContracts.length > 0 && user?.role === 'client' && (
-              <div className="mt-6 bg-white rounded-lg border border-gray-200 p-4">
-                <h3 className="font-medium text-gray-900 mb-3">Pending Reviews</h3>
-                <div className="space-y-3">
-                  {reviewableContracts.slice(0, 3).map((contract) => (
-                    <div key={contract.contract_id} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        {contract.other_party_avatar ? (
-                          <img
-                            src={contract.other_party_avatar}
-                            alt={contract.other_party_name}
-                            className="w-8 h-8 rounded-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                            <span className="text-xs text-gray-600">
-                              {contract.other_party_name.charAt(0).toUpperCase()}
-                            </span>
-                          </div>
-                        )}
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">
-                            {contract.other_party_name}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {contract.contract_title}
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => openReviewModal(contract)}
-                        className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                      >
-                        Rate
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                {reviewableContracts.length > 3 && (
-                  <button
-                    onClick={() => setActiveTab('pending')}
-                    className="mt-3 text-blue-600 hover:text-blue-700 text-sm font-medium"
-                  >
-                    View all {reviewableContracts.length} contracts
-                  </button>
-                )}
-              </div>
-            )}
+            {user && user.role === 'freelancer' && <ReviewStats userId={user.id} />}
           </div>
 
-          <div className="lg:col-span-2">
+          <div className={user?.role === 'client' ? "lg:col-span-3" : "lg:col-span-2"}>
             <div className="bg-white rounded-lg border border-gray-200">
               <div className="border-b border-gray-200">
                 <nav className="flex space-x-8 px-6">
-                  <button
-                    onClick={() => setActiveTab('received')}
-                    className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                      activeTab === 'received'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                    }`}
-                  >
-                    {user?.role === 'freelancer' ? 'Reviews' : 'Received'} ({receivedReviews.length})
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('given')}
-                    className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                      activeTab === 'given'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                    }`}
-                  >
-                    Given ({givenReviews.length})
-                  </button>
-                  {user?.role === 'client' && reviewableContracts.length > 0 && (
+                  {user?.role === 'freelancer' && (
                     <button
-                      onClick={() => setActiveTab('pending')}
+                      onClick={() => setActiveTab('received')}
                       className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                        activeTab === 'pending'
+                        activeTab === 'received'
                           ? 'border-blue-500 text-blue-600'
                           : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                       }`}
                     >
-                      To Review ({reviewableContracts.length})
+                      Reviews ({receivedReviews.length})
                     </button>
+                  )}
+                  {user?.role === 'client' && (
+                    <>
+                      <button
+                        onClick={() => setActiveTab('given')}
+                        className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                          activeTab === 'given'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        }`}
+                      >
+                        Given ({givenReviews.length})
+                      </button>
+                      {reviewableContracts.length > 0 && (
+                        <button
+                          onClick={() => setActiveTab('pending')}
+                          className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                            activeTab === 'pending'
+                              ? 'border-blue-500 text-blue-600'
+                              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                          }`}
+                        >
+                          To Review ({reviewableContracts.length})
+                        </button>
+                      )}
+                    </>
                   )}
                 </nav>
               </div>
 
               <div className="p-6">
-                {activeTab === 'received' && (
+                {user?.role === 'freelancer' && activeTab === 'received' && (
                   <div className="space-y-4">
                     {receivedReviews.length > 0 ? (
                       receivedReviews.map((review) => (
@@ -220,20 +172,17 @@ const ReviewsPage = () => {
                       <div className="text-center py-8">
                         <StarIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                         <h3 className="text-lg font-medium text-gray-900 mb-2">
-                          {user?.role === 'freelancer' ? 'No reviews yet' : 'No reviews received yet'}
+                          No reviews yet
                         </h3>
                         <p className="text-gray-500">
-                          {user?.role === 'freelancer' 
-                            ? 'Complete contracts to start receiving reviews from clients.' 
-                            : 'Complete contracts to start receiving reviews from clients and freelancers.'
-                          }
+                          Complete contracts to start receiving reviews from clients.
                         </p>
                       </div>
                     )}
                   </div>
                 )}
 
-                {activeTab === 'given' && (
+                {user?.role === 'client' && activeTab === 'given' && (
                   <div className="space-y-4">
                     {givenReviews.length > 0 ? (
                       givenReviews.map((review) => (
@@ -243,23 +192,20 @@ const ReviewsPage = () => {
                       <div className="text-center py-8">
                         <ChatBubbleLeftRightIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                         <h3 className="text-lg font-medium text-gray-900 mb-2">
-                          {user?.role === 'client' ? 'No reviews given yet' : 'No reviews written yet'}
+                          No reviews given yet
                         </h3>
                         <p className="text-gray-500">
-                          {user?.role === 'client' 
-                            ? 'Rate your experience with completed contracts to help other clients.' 
-                            : 'Complete contracts as a client to start giving reviews to freelancers.'
-                          }
+                          Rate your experience with completed contracts to help other clients.
                         </p>
                       </div>
                     )}
                   </div>
                 )}
 
-                {activeTab === 'pending' && (
+                {user?.role === 'client' && activeTab === 'pending' && (
                   <div className="space-y-4">
                     <h3 className="text-lg font-medium text-gray-900 mb-4">
-                      {user?.role === 'client' ? 'Contracts to Review' : 'Pending Reviews'}
+                      Contracts to Review
                     </h3>
                     {reviewableContracts.length > 0 ? (
                       reviewableContracts.map((contract) => (
@@ -300,13 +246,10 @@ const ReviewsPage = () => {
                       <div className="text-center py-8">
                         <ClockIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                         <h3 className="text-lg font-medium text-gray-900 mb-2">
-                          {user?.role === 'client' ? 'No contracts to review' : 'No pending reviews'}
+                          No contracts to review
                         </h3>
                         <p className="text-gray-500">
-                          {user?.role === 'client' 
-                            ? 'All your completed contracts have been reviewed.' 
-                            : 'Complete contracts as a client to review freelancers.'
-                          }
+                          All your completed contracts have been reviewed.
                         </p>
                       </div>
                     )}

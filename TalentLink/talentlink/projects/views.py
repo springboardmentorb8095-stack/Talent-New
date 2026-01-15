@@ -114,10 +114,8 @@ class ProposalListCreateView(generics.ListCreateAPIView):
             if project.client == self.request.user:
                 raise serializers.ValidationError("Clients cannot submit proposals to their own projects.")
             
-            # Create the proposal
             proposal = serializer.save(freelancer=self.request.user, project=project)
             
-            # Create notification for the client
             Notification.objects.create(
                 recipient=project.client,
                 notification_type='proposal_submitted',
@@ -127,7 +125,6 @@ class ProposalListCreateView(generics.ListCreateAPIView):
                 related_proposal=proposal
             )
             
-            # Send email notification to client
             if project.client.email:
                 send_proposal_submitted_email(
                     project.client.email,
@@ -158,17 +155,14 @@ class ProposalDetailView(generics.RetrieveUpdateDestroyAPIView):
         user = request.user
         
         if user == proposal.project.client:
-            # Client updating: use StatusSerializer
             serializer = ProposalStatusSerializer(proposal, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             
-            # Check if status is being changed
             old_status = proposal.status
             new_status = serializer.validated_data.get('status')
             
             self.perform_update(serializer)
             
-            # Create notification for freelancer if status changed
             if old_status != new_status:
                 if new_status == 'accepted':
                     Notification.objects.create(
@@ -179,7 +173,6 @@ class ProposalDetailView(generics.RetrieveUpdateDestroyAPIView):
                         related_project=proposal.project,
                         related_proposal=proposal
                     )
-                    # Send email notification to freelancer
                     if proposal.freelancer.email:
                         send_proposal_accepted_email(
                             proposal.freelancer.email,
@@ -194,7 +187,6 @@ class ProposalDetailView(generics.RetrieveUpdateDestroyAPIView):
                         related_project=proposal.project,
                         related_proposal=proposal
                     )
-                    # Send email notification to freelancer
                     if proposal.freelancer.email:
                         send_proposal_rejected_email(
                             proposal.freelancer.email,
@@ -206,7 +198,6 @@ class ProposalDetailView(generics.RetrieveUpdateDestroyAPIView):
         elif user == proposal.freelancer:
             if proposal.status != 'pending':
                 return Response({"error": "Cannot edit proposal after it has been processed."}, status=status.HTTP_400_BAD_REQUEST)
-            # Freelancer updating: use ProposalSerializer (default)
             return super().update(request, *args, **kwargs)
         
         else:

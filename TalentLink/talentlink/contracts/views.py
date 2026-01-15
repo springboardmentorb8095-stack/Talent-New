@@ -14,7 +14,7 @@ from .serializers import (
     ContractStatusUpdateSerializer, ContractSignSerializer,
     ContractStatusHistorySerializer, ContractProgressUpdateSerializer
 )
-from projects.models import Proposal
+from projects.models import Proposal, Project
 
 class ContractViewSet(ModelViewSet):
     queryset = Contract.objects.all()
@@ -35,6 +35,32 @@ class ContractViewSet(ModelViewSet):
             return ContractProgressUpdateSerializer
         return ContractSerializer
     
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        
+        old_status = instance.status
+        
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        
+        self.perform_update(serializer)
+        
+        if old_status != 'completed' and instance.status == 'completed':
+            project = instance.proposal.project
+            project.status = Project.STATUS_COMPLETED
+            project.save()
+            
+            ContractStatusHistory.objects.create(
+                contract=instance,
+                old_status=old_status,
+                new_status='completed',
+                changed_by=request.user,
+                reason="Contract manually marked as completed"
+            )
+        
+        return Response(serializer.data)
+    
     def get_queryset(self):
         user = self.request.user
         if user.role == 'client':
@@ -44,7 +70,6 @@ class ContractViewSet(ModelViewSet):
         return Contract.objects.none()
     
     def create(self, request, *args, **kwargs):
-        """Create a contract from an accepted proposal"""
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
@@ -63,14 +88,12 @@ class ContractViewSet(ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        # Check if contract already exists for this proposal
         if hasattr(proposal, 'contract'):
             return Response(
                 {"error": "Contract already exists for this proposal"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Check permissions
         if request.user != proposal.project.client:
             return Response(
                 {"error": "Only the client can create a contract"}, 
@@ -88,7 +111,11 @@ class ContractViewSet(ModelViewSet):
                 **serializer.validated_data
             )
             
-            # Create status history
+            project = proposal.project
+            old_project_status = project.status
+            project.status = Project.STATUS_IN_PROGRESS
+            project.save()
+            
             ContractStatusHistory.objects.create(
                 contract=contract,
                 old_status='',
@@ -102,7 +129,6 @@ class ContractViewSet(ModelViewSet):
     
     @action(detail=True, methods=['post'])
     def sign(self, request, pk=None):
-        """Sign or reject a contract"""
         contract = self.get_object()
         serializer = ContractSignSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -110,7 +136,6 @@ class ContractViewSet(ModelViewSet):
         action = serializer.validated_data['action']
         reason = serializer.validated_data.get('reason', '')
         
-        # Check permissions
         if request.user not in [contract.client, contract.freelancer]:
             return Response(
                 {"error": "Only contract parties can sign"}, 
@@ -131,16 +156,13 @@ class ContractViewSet(ModelViewSet):
             else:
                 contract.freelancer_signed_at = timezone.now()
             
-            # Activate contract if both parties signed
             if contract.is_fully_signed:
                 contract.status = 'active'
                 contract.save()
                 
-                # Update proposal status
                 contract.proposal.status = 'accepted'
                 contract.proposal.save()
                 
-                # Create status history
                 ContractStatusHistory.objects.create(
                     contract=contract,
                     old_status=old_status,
@@ -153,11 +175,9 @@ class ContractViewSet(ModelViewSet):
             contract.status = 'terminated'
             contract.save()
             
-            # Update proposal status
             contract.proposal.status = 'rejected'
             contract.proposal.save()
             
-            # Create status history
             ContractStatusHistory.objects.create(
                 contract=contract,
                 old_status=old_status,
@@ -172,7 +192,6 @@ class ContractViewSet(ModelViewSet):
     
     @action(detail=True, methods=['get'])
     def status_history(self, request, pk=None):
-        """Get contract status history"""
         contract = self.get_object()
         history = contract.status_history.all()
         serializer = ContractStatusHistorySerializer(history, many=True)
@@ -180,26 +199,22 @@ class ContractViewSet(ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def active(self, request):
-        """Get active contracts"""
         active_contracts = self.get_queryset().filter(status='active')
         serializer = ContractSerializer(active_contracts, many=True)
         return Response(serializer.data)
     
     @action(detail=True, methods=['post'])
     def update_progress(self, request, pk=None):
-        """Update contract progress (only for freelancers)"""
         contract = self.get_object()
         serializer = ContractProgressUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
-        # Check permissions - only freelancer can update progress
         if request.user != contract.freelancer:
             return Response(
                 {"error": "Only the freelancer can update progress"}, 
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # Check if contract is active or signed (allow progress updates for signed contracts too)
         if contract.status not in ['active', 'signed', 'draft']:
             return Response(
                 {"error": "Progress can only be updated for active, signed, or draft contracts"}, 
@@ -208,13 +223,10 @@ class ContractViewSet(ModelViewSet):
         
         new_progress = serializer.validated_data['progress']
         
-        # Update progress and timestamp
         contract.progress = new_progress
         contract.progress_updated_at = timezone.now()
         
-        # Automatically mark contract as completed when progress reaches 100%
         if new_progress == 100 and contract.status != 'completed':
-            # Create status history entry
             ContractStatusHistory.objects.create(
                 contract=contract,
                 old_status=contract.status,
@@ -224,15 +236,17 @@ class ContractViewSet(ModelViewSet):
             )
             contract.status = 'completed'
             contract.end_date = timezone.now().date()
+            
+            project = contract.proposal.project
+            project.status = Project.STATUS_COMPLETED
+            project.save()
         
         contract.save()
         
-        # Return updated contract
         contract_serializer = ContractSerializer(contract)
         return Response(contract_serializer.data, status=status.HTTP_200_OK)
 
 class ContractFromProposalView(generics.CreateAPIView):
-    """Create a contract directly from a proposal"""
     permission_classes = [IsAuthenticated]
     serializer_class = ContractCreateSerializer
     
@@ -247,14 +261,12 @@ class ContractFromProposalView(generics.CreateAPIView):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        # Check permissions
         if request.user != proposal.project.client:
             return Response(
                 {"error": "Only the client can create a contract"}, 
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # Check if contract already exists
         if hasattr(proposal, 'contract'):
             return Response(
                 {"error": "Contract already exists for this proposal"}, 
@@ -275,7 +287,11 @@ class ContractFromProposalView(generics.CreateAPIView):
                 **serializer.validated_data
             )
             
-            # Create status history
+            project = proposal.project
+            old_project_status = project.status
+            project.status = Project.STATUS_IN_PROGRESS
+            project.save()
+            
             ContractStatusHistory.objects.create(
                 contract=contract,
                 old_status='',

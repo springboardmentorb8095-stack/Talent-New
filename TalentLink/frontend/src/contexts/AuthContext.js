@@ -61,6 +61,15 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const changePassword = async (passwordData) => {
+    try {
+      const response = await authAPI.changePassword(passwordData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
@@ -72,6 +81,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    changePassword,
     loading,
   };
 

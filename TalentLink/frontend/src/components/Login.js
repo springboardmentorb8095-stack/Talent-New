@@ -216,7 +216,7 @@ const Login = () => {
                     name="username"
                     type="text"
                     required
-                    className="block w-full pl-10 pr-3 py-3 bg-white/20 border border-white/10 rounded-lg placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all sm:text-sm backdrop-blur-sm"
+                    className="block w-full pl-10 pr-3 py-3 bg-white/20 border border-white/10 rounded-lg placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base sm:text-sm backdrop-blur-sm"
                     placeholder="Enter your username"
                     value={formData.username}
                     onChange={handleChange}
@@ -237,7 +237,7 @@ const Login = () => {
                     name="password"
                     type={showPassword ? 'text' : 'password'}
                     required
-                    className="block w-full pl-10 pr-12 py-3 bg-white/20 border border-white/10 rounded-lg placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all sm:text-sm backdrop-blur-sm"
+                    className="block w-full pl-10 pr-12 py-3 bg-white/20 border border-white/10 rounded-lg placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base sm:text-sm backdrop-blur-sm"
                     placeholder="Enter your password"
                     value={formData.password}
                     onChange={handleChange}

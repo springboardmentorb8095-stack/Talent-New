@@ -13,7 +13,8 @@ const Register = () => {
     email: '',
     username: '',
     password: '',
-    confirmPassword: '',
+    password_confirm: '',
+    role: 'client', // Default role since it's required by the User model
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -50,10 +51,85 @@ const Register = () => {
     }
 
     try {
+      console.log('Registration attempt with data:', formData);
+      
+      // Add production debugging
+      if (process.env.NODE_ENV === 'production') {
+        console.log('Production environment detected');
+        console.log('API Base URL:', process.env.REACT_APP_API_URL_PROD || 'https://talentlink-7pqy.onrender.com/api');
+      }
+      
       await register(formData);
+      console.log('Registration successful');
       navigate('/dashboard');
     } catch (error) {
-      setError(error.response?.data?.detail || 'Registration failed');
+      console.error('=== REGISTRATION ERROR DEBUG ===');
+      console.error('Error object:', error);
+      console.error('Error response:', error.response);
+      console.error('Error status:', error.response?.status);
+      console.error('Error statusText:', error.response?.statusText);
+      console.error('Error data:', error.response?.data);
+      console.error('Error message:', error.message);
+      console.error('Error config:', error.config);
+      console.error('Error URL:', error.config?.url);
+      console.error('Error method:', error.config?.method);
+      console.error('Error headers:', error.config?.headers);
+      
+      // Log all available error response data
+      if (error.response?.data) {
+        const errorData = error.response.data;
+        console.error('Full error response data:', JSON.stringify(errorData, null, 2));
+        
+        // Check for all possible field errors
+        Object.keys(errorData).forEach(key => {
+          console.error(`Field "${key}" error:`, errorData[key]);
+        });
+      }
+      
+      let errorMessage = 'Registration failed. ';
+      
+      if (error.response?.status === 400) {
+        const errorData = error.response.data;
+        
+        // Check for specific field errors
+        if (errorData?.username) {
+          errorMessage += `Username: ${errorData.username[0]}`;
+        } else if (errorData?.email) {
+          errorMessage += `Email: ${errorData.email[0]}`;
+        } else if (errorData?.password) {
+          errorMessage += `Password: ${errorData.password[0]}`;
+        } else if (errorData?.password_confirm) {
+          errorMessage += `Password confirmation: ${errorData.password_confirm[0]}`;
+        } else if (errorData?.first_name) {
+          errorMessage += `First name: ${errorData.first_name[0]}`;
+        } else if (errorData?.last_name) {
+          errorMessage += `Last name: ${errorData.last_name[0]}`;
+        } else if (errorData?.role) {
+          errorMessage += `Role: ${errorData.role[0]}`;
+        } else if (errorData?.detail) {
+          errorMessage += errorData.detail;
+        } else if (errorData?.non_field_errors) {
+          errorMessage += errorData.non_field_errors[0];
+        } else {
+          // Generic 400 error with unknown fields
+          const fieldErrors = Object.keys(errorData).map(key => `${key}: ${errorData[key][0]}`).join(', ');
+          errorMessage += `Validation errors: ${fieldErrors}`;
+        }
+      } else if (error.response?.status === 409) {
+        errorMessage += 'Username or email already exists.';
+      } else if (error.response?.status === 500) {
+        errorMessage += 'Server error. Please try again later.';
+      } else if (error.response?.status === 0) {
+        errorMessage += 'Network error - unable to reach server. Please check your connection.';
+      } else if (error.response?.data?.detail) {
+        errorMessage += error.response.data.detail;
+      } else if (error.message) {
+        errorMessage += error.message;
+      } else {
+        errorMessage += 'Please try again.';
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -409,9 +485,52 @@ const Register = () => {
                     </motion.div>
                 </motion.div>
             </div>
-
+            {/* Role Selection */}
             <motion.div 
-                variants={staggerItem}
+                className="mt-6"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 1.8 }}
+            >
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                    I am a:
+                </label>
+                <div className="grid grid-cols-2 gap-4">
+                    <button
+                        type="button"
+                        onClick={() => setFormData({...formData, role: 'client'})}
+                        className={`p-3 rounded-lg border-2 transition-all ${
+                            formData.role === 'client' 
+                            ? 'border-blue-500 bg-blue-500/20 text-blue-300' 
+                            : 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'
+                        }`}
+                    >
+                        <div className="text-center">
+                            <BriefcaseIcon className="h-6 w-6 mx-auto mb-1" />
+                            <div className="text-sm font-medium">Client</div>
+                            <div className="text-xs opacity-75">Hire talent</div>
+                        </div>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setFormData({...formData, role: 'freelancer'})}
+                        className={`p-3 rounded-lg border-2 transition-all ${
+                            formData.role === 'freelancer' 
+                            ? 'border-blue-500 bg-blue-500/20 text-blue-300' 
+                            : 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'
+                        }`}
+                    >
+                        <div className="text-center">
+                            <UserIcon className="h-6 w-6 mx-auto mb-1" />
+                            <div className="text-sm font-medium">Freelancer</div>
+                            <div className="text-xs opacity-75">Find work</div>
+                        </div>
+                    </button>
+                </div>
+            </motion.div>
+            
+            <motion.div 
+                className="mt-6"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 2.0 }}

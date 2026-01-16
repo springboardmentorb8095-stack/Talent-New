@@ -1,0 +1,51 @@
+databases:
+  # PostgreSQL Database
+  - name: talentlink-db
+    databaseName: talentlink
+    user: talentlink
+    plan: free
+    region: oregon
+
+services:
+  # Django + React Web Service
+  - type: web
+    name: talentlink-web
+    region: oregon
+    plan: free
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn talentlink.wsgi:application"
+    healthCheckPath: /health/
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: talentlink-db
+          property: connectionString
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DJANGO_SETTINGS_MODULE
+        value: talentlink.settings
+      - key: DEBUG
+        value: False
+      - key: RENDER
+        value: True
+      - key: WEB_CONCURRENCY
+        value: 4
+      - key: RENDER_EXTERNAL_HOSTNAME
+        sync: false
+      - key: ALLOWED_HOSTS
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: EMAIL_HOST
+        sync: false
+      - key: EMAIL_PORT
+        sync: false
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: DEFAULT_FROM_EMAIL
+        sync: false

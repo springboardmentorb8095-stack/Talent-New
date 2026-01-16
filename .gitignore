@@ -1,12 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+/staticfiles/
+/media/
+.env
+.env.local
+
 # Node
 node_modules/
 
-# React build
-build/
-dist/
+# React build (keep this - we need it for deployment)
+# The build.sh script will create this on Render
+frontend/build/
+frontend/dist/
 
-# Env
-.env
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
 # OS
 .DS_Store
+Thumbs.db
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Misc
+*.bak
+.cache/

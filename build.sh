@@ -1,3 +1,23 @@
+# #!/usr/bin/env bash
+# # exit on error
+# set -o errexit
+
+# # Install Python dependencies
+# pip install -r requirements.txt
+
+# # Build React frontend
+# cd frontend
+# npm install
+# npm run build
+# cd ..
+
+# # Collect static files
+# python manage.py collectstatic --no-input
+
+# # Run migrations
+# python manage.py migrate
+
+
 #!/usr/bin/env bash
 # exit on error
 set -o errexit
@@ -16,3 +36,6 @@ python manage.py collectstatic --no-input
 
 # Run migrations
 python manage.py migrate
+
+# ✅ POPULATE SKILLS
+python manage.py populate_skills

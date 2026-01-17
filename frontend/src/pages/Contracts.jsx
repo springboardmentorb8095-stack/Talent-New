@@ -242,6 +242,101 @@
 
 // export default Contracts;
 
+//17 jan
+
+// import { useEffect, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { getMyContracts, updateContractStatus } from "../services/contractService";
+// import "./Contracts.css";
+
+// function Contracts() {
+//   const [contracts, setContracts] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const navigate = useNavigate();
+
+//   // 🔄 Fetch contracts
+//   useEffect(() => {
+//     getMyContracts()
+//       .then((res) => {
+//         setContracts(res.data);
+//         setLoading(false);
+//       })
+//       .catch((err) => {
+//         console.error("Error fetching contracts", err);
+//         setLoading(false);
+//       });
+//   }, []);
+
+//   // ✅ Complete contract
+//   const completeContract = async (contractId) => {
+//     try {
+//       await updateContractStatus(contractId, "completed");
+//       setContracts((prev) =>
+//         prev.map((c) =>
+//           c.id === contractId ? { ...c, status: "completed" } : c
+//         )
+//       );
+//     } catch (err) {
+//       console.error("Error updating contract", err);
+//       alert("Failed to complete contract");
+//     }
+//   };
+
+//   // ❌ Cancel contract
+//   const cancelContract = async (contractId) => {
+//     try {
+//       await updateContractStatus(contractId, "cancelled");
+//       setContracts((prev) =>
+//         prev.map((c) =>
+//           c.id === contractId ? { ...c, status: "cancelled" } : c
+//         )
+//       );
+//     } catch (err) {
+//       console.error("Error cancelling contract", err);
+//       alert("Failed to cancel contract");
+//     }
+//   };
+
+//   if (loading) return <p>Loading contracts...</p>;
+
+//   return (
+//     <div className="contracts-page">
+//       <h2>My Contracts</h2>
+
+//       {contracts.length === 0 && <p>No contracts found</p>}
+
+//       {contracts.map((contract) => (
+//         <div key={contract.id} className="contract-card">
+//           <p><strong>Project:</strong> {contract.project_title}</p>
+//           <p><strong>Client:</strong> {contract.client_name}</p>
+//           <p><strong>Freelancer:</strong> {contract.freelancer_name}</p>
+//           <p><strong>Amount:</strong> ₹{contract.amount}</p>
+//           <p><strong>Status:</strong> {contract.status}</p>
+
+//           {contract.status === "active" && (
+//             <div className="contract-actions">
+//               <button onClick={() => completeContract(contract.id)}>
+//                 Complete
+//               </button>
+//               <button onClick={() => cancelContract(contract.id)}>
+//                 Cancel
+//               </button>
+//             </div>
+//           )}
+
+//           {contract.status === "completed" && (
+//             <button onClick={() => navigate(`/contracts/${contract.id}/review`)}>
+//               Leave Review
+//             </button>
+//           )}
+//         </div>
+//       ))}
+//     </div>
+//   );
+// }
+
+// export default Contracts;
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMyContracts, updateContractStatus } from "../services/contractService";
@@ -311,6 +406,23 @@ function Contracts() {
           <p><strong>Amount:</strong> ₹{contract.amount}</p>
           <p><strong>Status:</strong> {contract.status}</p>
 
+          {/* ✅ CHAT BUTTON */}
+          <button 
+            onClick={() => navigate(`/contracts/${contract.id}/chat`)}
+            style={{
+              padding: "8px 16px",
+              backgroundColor: "#6c757d",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              marginRight: "10px",
+              marginTop: "10px"
+            }}
+          >
+            Open Chat
+          </button>
+
           {contract.status === "active" && (
             <div className="contract-actions">
               <button onClick={() => completeContract(contract.id)}>
@@ -323,7 +435,18 @@ function Contracts() {
           )}
 
           {contract.status === "completed" && (
-            <button onClick={() => navigate(`/contracts/${contract.id}/review`)}>
+            <button 
+              onClick={() => navigate(`/contracts/${contract.id}/review`)}
+              style={{
+                padding: "8px 16px",
+                backgroundColor: "#2563eb",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                marginTop: "10px"
+              }}
+            >
               Leave Review
             </button>
           )}

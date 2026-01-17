@@ -1,23 +1,20 @@
 .leave-review-container {
-  max-width: 600px;
-  margin: 60px auto;
-  background: #ffffff;
   padding: 30px;
-  border-radius: 14px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  max-width: 500px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .leave-review-container h2 {
-  text-align: center;
-  margin-bottom: 25px;
-  font-size: 26px;
-  color: #222;
+  margin-bottom: 20px;
+  color: #333;
 }
 
 .review-project {
-  font-weight: 600;
-  margin-bottom: 15px;
-  color: #444;
+  margin-bottom: 20px;
+  font-size: 16px;
 }
 
 .review-field {
@@ -26,46 +23,50 @@
 
 .review-field label {
   display: block;
-  font-weight: 500;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  font-weight: bold;
   color: #333;
 }
 
-.review-field select {
-  padding: 6px 10px;
-  font-size: 16px;
-  border-radius: 6px;
+.review-field select,
+.review-field textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 14px;
 }
 
 .review-field textarea {
-  width: 100%;
-  min-height: 120px;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  font-size: 15px;
   resize: vertical;
-}
-
-.review-field textarea:focus,
-.review-field select:focus {
-  outline: none;
-  border-color: #4f46e5;
+  min-height: 120px;
 }
 
 .submit-review-btn {
   width: 100%;
   padding: 12px;
-  background: #4f46e5;
+  background-color: #2563eb;
   color: white;
   border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 600;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  font-weight: bold;
+  font-size: 16px;
+  margin-top: 10px;
 }
 
-.submit-review-btn:hover {
-  background: #4338ca;
+.submit-review-btn:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.submit-review-btn:disabled {
+  background-color: #999;
+  cursor: not-allowed;
+}
+
+.loading {
+  padding: 20px;
+  text-align: center;
+  font-size: 16px;
 }

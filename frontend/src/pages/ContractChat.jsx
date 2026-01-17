@@ -246,9 +246,110 @@
 
 // export default ContractChat;
 
+// 17 jan
+
+// import { useEffect, useState } from "react";
+// import { useParams } from "react-router-dom";
+// import api from "../api/axios";
+// import "./ContractChat.css";
+
+// function ContractChat() {
+//   const { contractId } = useParams();
+
+//   const [messages, setMessages] = useState([]);
+//   const [newMessage, setNewMessage] = useState("");
+//   const [loading, setLoading] = useState(true);
+
+//   const currentUserName = localStorage.getItem("name") || "You";
+
+//   // 🔁 Fetch messages + Polling
+//   useEffect(() => {
+//     const fetchMessages = async () => {
+//       try {
+//         const res = await api.get(
+//           `/messages/contract/${contractId}/`
+//         );
+//         setMessages(res.data);
+//       } catch (err) {
+//         console.error("Error loading messages", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchMessages(); // initial load
+//     const interval = setInterval(fetchMessages, 3000); // polling every 3 seconds
+
+//     return () => clearInterval(interval);
+//   }, [contractId]);
+
+//   // 💬 Send message
+//   const handleSendMessage = async (e) => {
+//     e.preventDefault();
+
+//     if (!newMessage.trim()) return;
+
+//     try {
+//       await api.post("/messages/send/", {
+//         contract_id: contractId,
+//         content: newMessage,
+//       });
+
+//       setNewMessage("");
+
+//       // Refresh messages
+//       const res = await api.get(`/messages/contract/${contractId}/`);
+//       setMessages(res.data);
+//     } catch (err) {
+//       console.error("Error sending message", err);
+//       alert("Failed to send message");
+//     }
+//   };
+
+//   if (loading) return <p>Loading chat...</p>;
+
+//   return (
+//     <div className="contract-chat">
+//       <h2>Contract Chat - {contractId}</h2>
+
+//       {/* Messages */}
+//       <div className="messages-container">
+//         {messages.length === 0 && <p>No messages yet. Start the conversation!</p>}
+
+//         {messages.map((msg) => (
+//           <div
+//             key={msg.id}
+//             className={`message ${
+//               msg.sender_name === currentUserName ? "sent" : "received"
+//             }`}
+//           >
+//             <strong>{msg.sender_name}</strong>
+//             <p>{msg.content}</p>
+//             <small>{new Date(msg.timestamp).toLocaleTimeString()}</small>
+//           </div>
+//         ))}
+//       </div>
+
+//       {/* Message Input */}
+//       <form onSubmit={handleSendMessage} className="message-form">
+//         <input
+//           type="text"
+//           placeholder="Type your message..."
+//           value={newMessage}
+//           onChange={(e) => setNewMessage(e.target.value)}
+//           required
+//         />
+//         <button type="submit">Send</button>
+//       </form>
+//     </div>
+//   );
+// }
+
+// export default ContractChat;
+
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import api from "../api/axios";
+import { getContractMessages, sendMessage } from "../services/messageService";
 import "./ContractChat.css";
 
 function ContractChat() {
@@ -264,9 +365,7 @@ function ContractChat() {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const res = await api.get(
-          `/messages/contract/${contractId}/`
-        );
+        const res = await getContractMessages(contractId);
         setMessages(res.data);
       } catch (err) {
         console.error("Error loading messages", err);
@@ -288,15 +387,11 @@ function ContractChat() {
     if (!newMessage.trim()) return;
 
     try {
-      await api.post("/messages/send/", {
-        contract_id: contractId,
-        content: newMessage,
-      });
-
+      await sendMessage(contractId, newMessage);
       setNewMessage("");
 
       // Refresh messages
-      const res = await api.get(`/messages/contract/${contractId}/`);
+      const res = await getContractMessages(contractId);
       setMessages(res.data);
     } catch (err) {
       console.error("Error sending message", err);

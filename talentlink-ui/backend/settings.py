@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "corsheaders",
 
+    # 🔥 REQUIRED FOR FILTER UI
+    "django_filters",
+
     # Local apps
     "core",
 ]
@@ -49,7 +52,7 @@ INSTALLED_APPS = [
 # MIDDLEWARE
 # --------------------------------------------------
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",  # MUST be first
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -93,7 +96,7 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 
 # --------------------------------------------------
-# DATABASE (SQLite - Local)
+# DATABASE
 # --------------------------------------------------
 DATABASES = {
     "default": {
@@ -115,20 +118,30 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # --------------------------------------------------
-# CUSTOM USER MODEL (CRITICAL)
+# CUSTOM USER MODEL
 # --------------------------------------------------
 AUTH_USER_MODEL = "core.User"
 
 
 # --------------------------------------------------
-# DJANGO REST FRAMEWORK
+# DJANGO REST FRAMEWORK 🔥 FINAL FIX
 # --------------------------------------------------
 REST_FRAMEWORK = {
+    # ✅ REQUIRED FOR BROWSABLE API FILTER UI
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
     ),
+
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
+    ),
+
+    # 🔥 ENABLES FILTER / SEARCH / ORDER UI
+    "DEFAULT_FILTER_BACKENDS": (
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
     ),
 }
 
@@ -144,18 +157,16 @@ SIMPLE_JWT = {
 
 
 # --------------------------------------------------
-# EMAIL CONFIGURATION (OTP + RESET)
+# EMAIL CONFIGURATION
 # --------------------------------------------------
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = "TalentLink <no-reply@talentlink.com>"
 
 
-
-
 # --------------------------------------------------
-# CORS CONFIGURATION (REACT)
+# CORS CONFIGURATION
 # --------------------------------------------------
-CORS_ALLOW_ALL_ORIGINS = True  # Development only
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 # --------------------------------------------------

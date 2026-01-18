@@ -1,75 +1,435 @@
+/* =========================================================
+   🌈 DESIGN SYSTEM — TALENTLINK (PREMIUM)
+   Google × Linear × Upwork inspired
+========================================================= */
+
+/* ================= THEME VARIABLES ================= */
+:root {
+  --bg-main: #f8fafc;
+  --bg-card: rgba(255, 255, 255, 0.75);
+  --bg-sidebar: #0f172a;
+
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+
+  --primary: #6366f1;
+  --secondary: #22d3ee;
+  --accent: #ec4899;
+
+  --border-glass: rgba(255, 255, 255, 0.35);
+  --shadow-soft: 0 20px 40px rgba(15, 23, 42, 0.12);
+  --shadow-hover: 0 28px 60px rgba(15, 23, 42, 0.18);
+
+  --success: #22c55e;
+  --danger: #ef4444;
+}
+
+/* ================= DARK MODE ================= */
+[data-theme="dark"] {
+  --bg-main: #020617;
+  --bg-card: rgba(15, 23, 42, 0.85);
+  --bg-sidebar: #020617;
+
+  --text-main: #e5e7eb;
+  --text-muted: #94a3b8;
+
+  --border-glass: rgba(255, 255, 255, 0.12);
+  --shadow-soft: 0 20px 60px rgba(0, 0, 0, 0.5);
+  --shadow-hover: 0 30px 80px rgba(0, 0, 0, 0.65);
+}
+
+/* ================= GLOBAL RESET ================= */
 * {
   box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
+  font-family: "Inter", "Poppins", system-ui, sans-serif;
 }
 
 body {
   margin: 0;
-  height: 100vh;
-  background: linear-gradient(120deg, #667eea, #764ba2);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
+  background: radial-gradient(circle at top, #e0e7ff, var(--bg-main));
+  color: var(--text-main);
 }
 
-.fade {
-  animation: fadeIn 0.8s ease;
+/* ================= TEXT ================= */
+h1, h2, h3, h4 {
+  margin: 0;
+  font-weight: 700;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+p {
+  margin: 6px 0;
 }
 
-.card {
-  width: 380px;
-  padding: 35px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(12px);
-  border-radius: 18px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+.muted {
+  color: var(--text-muted);
+}
+
+/* ================= BUTTONS ================= */
+button {
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.primary-btn,
+.primary {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: white;
+  padding: 12px 22px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-soft);
+}
+
+.primary-btn:hover,
+.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.secondary-btn,
+.secondary {
+  background: transparent;
+  border: 1px solid var(--border-glass);
+  color: var(--text-main);
+  padding: 12px 22px;
+  border-radius: 999px;
+}
+
+.secondary-btn:hover,
+.secondary:hover {
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.danger {
+  background: linear-gradient(135deg, #ef4444, #f43f5e);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 999px;
+}
+
+/* ================= INPUTS ================= */
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 14px 16px;
+  margin-top: 10px;
+  border-radius: 14px;
+  border: 1px solid var(--border-glass);
+  background: rgba(255, 255, 255, 0.5);
+  outline: none;
+  color: var(--text-main);
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* ================= CARD ================= */
+.card,
+.section-card,
+.contract-card,
+.project-tile,
+.proposal-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(18px);
+  border-radius: 22px;
+  padding: 26px;
+  border: 1px solid var(--border-glass);
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover,
+.project-tile:hover,
+.contract-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* ================= DASHBOARD ================= */
+.dashboard-layout {
+  display: flex;
+  height: 100vh;
+  background: var(--bg-main);
+}
+
+/* SIDEBAR */
+.dashboard-sidebar {
+  width: 260px;
+  background: linear-gradient(180deg, #020617, #0f172a);
+  color: white;
+  padding: 28px 20px;
+}
+
+.dashboard-sidebar .logo {
+  font-size: 26px;
+  font-weight: 800;
+  background: linear-gradient(90deg, #818cf8, #22d3ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 36px;
+}
+
+.side-link {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+}
+
+.side-link:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* MAIN */
+.dashboard-main {
+  flex: 1;
+  padding: 32px 40px;
+  overflow-y: auto;
+}
+
+/* TOPBAR */
+.dashboard-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+/* ================= STATS ================= */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 22px;
+  margin-bottom: 40px;
+}
+
+.stat-box {
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.2),
+    rgba(34, 211, 238, 0.2)
+  );
+  padding: 26px;
+  border-radius: 22px;
   text-align: center;
 }
 
-.card h2 {
-  margin-bottom: 20px;
+/* ================= GRID ================= */
+.projects-grid,
+.contracts-grid,
+.proposal-list {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
 }
 
-input, select {
-  width: 100%;
-  padding: 12px;
-  margin: 12px 0;
-  border-radius: 10px;
-  border: none;
-  outline: none;
+/* ================= STATUS BADGE ================= */
+.status-badge {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
 }
 
+.status-badge.open { background: #e0f2fe; color: #0369a1; }
+.status-badge.active { background: #dcfce7; color: #166534; }
+.status-badge.completed { background: #e0e7ff; color: #3730a3; }
+.status-badge.cancelled,
+.status-badge.rejected { background: #fee2e2; color: #991b1b; }
+
+/* ================= CHAT ================= */
+.chat-layout {
+  display: flex;
+  gap: 20px;
+}
+
+.chat-sidebar {
+  width: 300px;
+}
+
+.chat-messages {
+  background: rgba(255,255,255,0.6);
+  border-radius: 20px;
+  padding: 20px;
+  height: 520px;
+  overflow-y: auto;
+}
+
+.chat-bubble {
+  padding: 14px 18px;
+  border-radius: 18px;
+  max-width: 70%;
+  margin-bottom: 10px;
+}
+
+.chat-message.mine .chat-bubble {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  margin-left: auto;
+}
+
+/* ================= ANIMATIONS ================= */
+.fade {
+  animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================= LOADING ================= */
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 20px;
+  color: var(--text-muted);
+}
+/* ================= SKELETON LOADER ================= */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.08) 25%,
+    rgba(255,255,255,0.18) 37%,
+    rgba(255,255,255,0.08) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 12px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 0 }
+  100% { background-position: -100% 0 }
+}
+
+/* ================= PAGE TRANSITION ================= */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: all 0.4s ease;
+}
+
+/* ================= BUTTON RIPPLE ================= */
 button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  background: #00e5ff;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
 }
 
-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center,
+    rgba(255,255,255,0.35) 10%,
+    transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.link {
-  margin-top: 15px;
-  font-size: 14px;
-  cursor: pointer;
-  opacity: 0.9;
+button:active::after {
+  opacity: 1;
 }
 
-.link:hover {
-  text-decoration: underline;
+/* ================= CARD MICRO-HOVER ================= */
+.project-tile,
+.contract-card,
+.proposal-card,
+.section-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.project-tile:hover,
+.contract-card:hover,
+.proposal-card:hover,
+.section-card:hover {
+  transform: translateY(-6px) scale(1.015);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+}
+
+/* ================= LIST ITEM FADE ================= */
+.notification-row,
+.chat-message,
+.proposal-card {
+  animation: fadeSlideIn 0.4s ease;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================= LOADING SCREEN ================= */
+.loading-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-muted);
+  animation: pulse 1.4s ease infinite;
+}
+
+@keyframes pulse {
+  0%,100% { opacity: .5 }
+  50% { opacity: 1 }
+}
+/* ================= SETTINGS ================= */
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  margin-top: 30px;
+}
+
+.settings-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.settings-toggle input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary);
+}
+
+.danger-zone {
+  border: 1px solid rgba(239,68,68,0.4);
+  background: rgba(239,68,68,0.08);
 }

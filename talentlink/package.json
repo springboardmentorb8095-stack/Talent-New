@@ -1,5 +1,8 @@
 {
   "devDependencies": {
     "patch-package": "^8.0.1"
+  },
+  "dependencies": {
+    "recharts": "^3.6.0"
   }
 }

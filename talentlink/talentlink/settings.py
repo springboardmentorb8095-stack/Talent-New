@@ -181,7 +181,7 @@ CORS_ALLOW_METHODS = [
 # EMAIL_USE_TLS = True
 
 # EMAIL_HOST_USER = 'dhivya01052004@gmail.com'
-# EMAIL_HOST_PASSWORD = 'mbfl qpjz bjnu cszc'
+# EMAIL_HOST_PASSWORD = 'mbfl qpjz bjnu csze'
 
 # Dummy email backend — prints emails to console
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -203,3 +203,6 @@ CORS_ALLOW_HEADERS = [
     "x-csrftoken",
     "x-requested-with",
 ]
+
+
+

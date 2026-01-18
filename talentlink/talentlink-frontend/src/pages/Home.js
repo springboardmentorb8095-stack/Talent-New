@@ -1,4 +1,6 @@
 
+
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -28,7 +30,7 @@ const Home = () => {
     <>
       {/* ===== HEADER ===== */}
       <AppBar position="static" elevation={0} sx={{ background: "#0B2228" }}>
-        <Toolbar sx={{ justifyContent: "space-between" }}>
+        <Toolbar sx={{ justifyContent: "space-between" , py:1 }}>
           <Typography
             variant="h5"
             sx={{ fontWeight: 800, letterSpacing: 1, color: "#5E9FA6" }}
@@ -214,3 +216,5 @@ const Feature = ({ icon, title, text }) => (
 );
 
 export default Home;
+
+

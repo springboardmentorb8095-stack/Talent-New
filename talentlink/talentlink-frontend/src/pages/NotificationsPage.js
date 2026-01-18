@@ -89,7 +89,7 @@ function NotificationsPage() {
     <>
       {/* ===== HEADER ===== */}
       <AppBar position="static" elevation={0} sx={{ background: "#0B2228" }}>
-        <Toolbar sx={{ justifyContent: "space-between" }}>
+        <Toolbar sx={{ justifyContent: "space-between" , py:1 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <IconButton
               sx={{ color: "#A0C4C9" }}
@@ -98,8 +98,11 @@ function NotificationsPage() {
               <ArrowBack />
             </IconButton>
 
-            <Typography variant="h6" sx={{ fontWeight: 800, color: "#5E9FA6" }}>
-              Notifications
+            <Typography
+                        variant="h5"
+                        sx={{ fontWeight: 800, letterSpacing: 1, color: "#5E9FA6" }}
+                      >
+                        Notifications
             </Typography>
           </Box>
 

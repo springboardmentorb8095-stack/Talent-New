@@ -10,7 +10,7 @@ class User(AbstractUser):
     role = models.CharField(
         max_length=10,
         choices=ROLE_CHOICES,
-        default='freelancer'
+        # default='freelancer'
     )
     email = models.EmailField(
     unique=True,

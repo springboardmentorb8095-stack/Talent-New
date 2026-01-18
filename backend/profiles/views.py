@@ -9,12 +9,12 @@ class MyProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        profile = Profile.objects.get(user=request.user)
+        profile, _ = Profile.objects.get_or_create(user=request.user)
         serializer = ProfileSerializer(profile)
         return Response(serializer.data)
 
     def put(self, request):
-        profile = Profile.objects.get(user=request.user)
+        profile, _ = Profile.objects.get_or_create(user=request.user)
         serializer = ProfileSerializer(
             profile,
             data=request.data,

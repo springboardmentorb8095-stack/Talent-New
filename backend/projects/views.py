@@ -1,8 +1,11 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import PermissionDenied
+
 from .models import Project
 from .serializers import ProjectSerializer
 from .permissions import IsClient
+from contracts.models import Contract
 
 
 class ProjectListCreateView(generics.ListCreateAPIView):
@@ -10,7 +13,6 @@ class ProjectListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_permissions(self):
-        # Only clients can create projects
         if self.request.method == "POST":
             return [IsClient()]
         return [IsAuthenticated()]
@@ -21,15 +23,22 @@ class ProjectListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
 
-        # 🔐 ROLE-BASED BASE QUERYSET
+        # ---------------- CLIENT ----------------
+        # Client sees ALL their projects
         if user.role == "client":
             queryset = Project.objects.filter(client=user)
+
+        # ---------------- FREELANCER ----------------
+        # Freelancer sees ONLY projects WITHOUT contracts (OPEN projects)
         else:
-            queryset = Project.objects.all()
+            locked_project_ids = Contract.objects.values_list(
+                "project_id", flat=True
+            )
+            queryset = Project.objects.exclude(id__in=locked_project_ids)
 
         queryset = queryset.order_by("-created_at")
 
-        # 🔍 QUERY PARAM FILTERS
+        # ---------------- FILTERS ----------------
         skill = self.request.query_params.get("skill")
         min_budget = self.request.query_params.get("min_budget")
         max_budget = self.request.query_params.get("max_budget")
@@ -55,16 +64,26 @@ class ProjectListCreateView(generics.ListCreateAPIView):
 class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProjectSerializer
     permission_classes = [IsAuthenticated]
+    queryset = Project.objects.all()
 
-    def get_queryset(self):
+    def get_object(self):
+        project = super().get_object()
         user = self.request.user
 
-        # Client can access only their projects
-        if user.role == "client":
-            return Project.objects.filter(client=user)
+        # If project has a contract → LOCKED
+        try:
+            contract = project.contract
+        except Contract.DoesNotExist:
+            contract = None
 
-        # Freelancer can view all
-        return Project.objects.all()
+        if contract:
+            # Only client or hired freelancer can view
+            if user not in [contract.client, contract.freelancer]:
+                raise PermissionDenied(
+                    "This project is no longer available."
+                )
+
+        return project
 
     def perform_update(self, serializer):
         serializer.save(client=self.request.user)

@@ -1,0 +1,38 @@
+
+# proposals/models.py
+from django.db import models
+from django.utils import timezone
+from django.conf import settings
+from projects.models import Project  # ← Direct import for Project
+
+class Proposal(models.Model):
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name='proposals'
+    )
+    freelancer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='sent_proposals'
+    )
+    cover_letter = models.TextField()
+  
+    proposed_rate = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=[
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    ], default='pending')
+    
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+    class Meta:
+        db_table = 'proposals'
+        ordering = ['-created_at']
+        managed = False  
+
+    def __str__(self):
+       return f"{self.freelancer} → {self.project.title}"

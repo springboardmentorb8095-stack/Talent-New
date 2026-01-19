@@ -36,3 +36,11 @@ WEEK 6:
 
 1. Notification system (in-app / email placeholders).
 2. Add reviews & rating flow post-completion.
+
+WEEK 7 and 8 :
+
+1. Build client & freelancer dashboards (active projects, proposals, contracts).
+2. Add validations, error handling, form UX polish, and responsive design.
+3. Unit & integration tests for key endpoints; basic frontend tests.
+4. Deploy backend and frontend (Render/Heroku/AWS). Use PostgreSQL in production, configure environment variables, CORS, SSL.
+5. Final documentation, sample seed data, and demo scripts.

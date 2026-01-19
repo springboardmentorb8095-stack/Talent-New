@@ -1,0 +1,6 @@
+services:
+  - type: web
+    env: python
+    name: Talent-New-1
+    buildCommand: pip install -r requirements.txt
+    startCommand: python3 -m gunicorn talentlink.wsgi:application --bind 0.0.0.0:$PORT

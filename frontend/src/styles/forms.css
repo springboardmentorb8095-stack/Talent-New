@@ -1,0 +1,85 @@
+/* -------- Base layout -------- */
+.page-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 24px;
+}
+
+.page-title {
+  margin-bottom: 20px;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+/* -------- Form -------- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+}
+
+/* -------- Inputs -------- */
+.form input,
+.form textarea,
+.form select {
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+}
+
+.form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form input:focus,
+.form textarea:focus,
+.form select:focus {
+  border-color: #4f46e5; /* indigo */
+}
+
+/* -------- Button -------- */
+.form button {
+  margin-top: 10px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  background-color: #4f46e5;
+  color: white;
+  cursor: pointer;
+}
+
+.form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* -------- Messages -------- */
+.form-message {
+  margin-top: 10px;
+  font-size: 0.9rem;
+}
+
+.form-message.success {
+  color: green;
+}
+
+.form-message.error {
+  color: red;
+}

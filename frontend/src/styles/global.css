@@ -1,0 +1,143 @@
+/* ===== RESET ===== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: #f6f7fb;
+  color: #222;
+}
+
+/* ===== LAYOUT ===== */
+.page {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.page-center {
+  max-width: 420px;
+  margin: 80px auto;
+  padding: 0 20px;
+}
+
+/* ===== CARD ===== */
+.card {
+  background: #fff;
+  padding: 24px;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* ===== HEADINGS ===== */
+h2 {
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+/* ===== FORMS ===== */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+input,
+textarea,
+select {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+/* ===== BUTTONS ===== */
+button {
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  background: #4f46e5;
+  color: white;
+}
+
+button:hover {
+  background: #4338ca;
+}
+
+button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+/* ===== LINKS ===== */
+a {
+  color: #4f46e5;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ===== MESSAGES ===== */
+.success {
+  color: #16a34a;
+  font-size: 14px;
+}
+
+.error {
+  color: #dc2626;
+  font-size: 14px;
+}
+
+/* ===== LIST / CARDS ===== */
+.list-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 12px 0;
+  background: #fff;
+  transition: all 0.2s;
+}
+
+.list-card:hover {
+  border-color: #4f46e5;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.1);
+}
+
+/* ===== PAGE TITLE ===== */
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 24px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .page {
+    padding: 0 16px;
+  }
+  
+  .page-center {
+    padding: 0 16px;
+    margin: 40px auto;
+  }
+}

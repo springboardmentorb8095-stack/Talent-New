@@ -1,0 +1,33 @@
+.contracts-page {
+  display: flex;
+  gap: 20px;
+}
+
+.contracts-sidebar {
+  width: 300px;
+  border-right: 1px solid #ccc;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.contract-card {
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.contract-card.selected {
+  background-color: #f0f8ff;
+  border-color: #007bff;
+}
+
+.contracts-main {
+  flex: 1;
+  padding: 20px;
+}
+
+.contract-actions button {
+  margin-right: 10px;
+}

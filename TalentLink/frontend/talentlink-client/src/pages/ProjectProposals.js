@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { getAuthHeaders } from "../utils/auth";
 
-function ProjectProposals({ projectId, setPage }) {
+function ProjectProposals({ projectId, setPage, setChatUserId }) {
   const [proposals, setProposals] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -33,18 +33,23 @@ function ProjectProposals({ projectId, setPage }) {
     }
   };
 
-  const handleAction = async (proposalId, action) => {
-    try {
-      await axios.patch(
-        `http://127.0.0.1:8000/api/proposals/${proposalId}/${action}/`,
-        {},
-        getAuthHeaders()
-      );
-      fetchProposals(); // refresh list
-    } catch {
-      alert("Action failed");
-    }
-  };
+const handleAction = async (proposalId, action) => {
+  try {
+    await axios.patch(
+      `http://127.0.0.1:8000/api/proposals/${proposalId}/${action}/`,
+      {},
+      getAuthHeaders()
+    );
+
+    // ✅ Just refresh – no alert on success
+    fetchProposals();
+
+  } catch (err) {
+    console.error(err);
+    alert("Unable to perform action. Try again.");
+  }
+};
+
 
   return (
     <div className="projects-container">
@@ -122,6 +127,22 @@ function ProjectProposals({ projectId, setPage }) {
                   </button>
                 </div>
               )}
+
+                {p.status === "accepted" && (
+                  <div style={{ marginTop: "10px" }}>
+                    <button
+                      className="secondary-btn"
+                      onClick={() => {
+                        setChatUserId(p.freelancer_id);
+                        setPage("chat");
+                      }}
+                    >
+                      Chat
+                    </button>
+                  </div>
+                )}
+
+
             </div>
           ))}
 

@@ -5,11 +5,13 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView
 
-from .models import Project
-from .serializers import ProjectSerializer
+from projects.models import Project
+from projects.serializers import ProjectSerializer
 
 
-
+# ==============================
+# LIST ALL PROJECTS / CREATE PROJECT
+# ==============================
 class ProjectListCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -19,8 +21,8 @@ class ProjectListCreateView(APIView):
         serializer = ProjectSerializer(projects, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    # POST → create project (CLIENT ONLY)
     def post(self, request):
-    #  Only CLIENT can create projects
         if not hasattr(request.user, "userprofile") or request.user.userprofile.role != "client":
             return Response(
                 {"error": "Only clients can create projects"},
@@ -35,8 +37,9 @@ class ProjectListCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
+# ==============================
+# FILTER PROJECTS
+# ==============================
 class ProjectFilterView(ListAPIView):
     serializer_class = ProjectSerializer
 
@@ -78,21 +81,23 @@ class ProjectFilterView(ListAPIView):
         return queryset
 
 
-
+# ==============================
+# PROJECT DETAIL / UPDATE / DELETE
+# ==============================
 class ProjectDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         project = get_object_or_404(Project, pk=pk)
         serializer = ProjectSerializer(project)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk):
         project = get_object_or_404(Project, pk=pk, client=request.user)
         serializer = ProjectSerializer(project, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
@@ -102,3 +107,21 @@ class ProjectDetailView(APIView):
             {"message": "Project deleted successfully"},
             status=status.HTTP_204_NO_CONTENT
         )
+
+
+# ==============================
+# ✅ CLIENT → MY PROJECTS (THIS FIXES YOUR ERROR)
+# ==============================
+class MyProjectsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not hasattr(request.user, "userprofile") or request.user.userprofile.role != "client":
+            return Response(
+                {"error": "Only clients can view their projects"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        projects = Project.objects.filter(client=request.user).order_by("-created_at")
+        serializer = ProjectSerializer(projects, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

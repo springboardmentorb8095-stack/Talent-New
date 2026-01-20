@@ -43,14 +43,20 @@ INSTALLED_APPS += [
     'rest_framework_simplejwt',
     'corsheaders',
     'accounts',
+    'profiles',
     'contracts',
     'messages_app',
     'projects',
     'proposals',
     'reviews',
     'skills',
-    'userprofiles'
+    'userprofiles',
+    'channels',
+    'Notification.apps.NotificationConfig',
+
 ]
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 
 MIDDLEWARE = [
@@ -82,6 +88,15 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'talentlink_backend.wsgi.application'
+ASGI_APPLICATION = "talentlink_backend.asgi.application"
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
+
 
 
 # Database

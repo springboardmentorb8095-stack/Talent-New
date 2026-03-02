@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>New Review Received</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: #ffc107;
+            color: #333;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 20px;
+            background: #f9f9f9;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #ffc107;
+            color: #333;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .rating {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⭐ New Review Received!</h1>
+        </div>
+        <div class="content">
+            <h2>Hello {{ user_name }},</h2>
+            <p>You've received a new review for your work!</p>
+
+            <div style="background: white; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
+                <h3>Review Details:</h3>
+                <p><strong>From:</strong> {{ reviewer_name }}</p>
+                <p><strong>Project:</strong> {{ project_title }}</p>
+                <div class="rating"><strong>Rating:</strong> {{ rating_stars }} ({{ rating }}/5)</div>
+                <p><strong>Comment:</strong></p>
+                <p style="font-style: italic; background: #f8f9fa; padding: 10px; border-radius: 5px;">"{{
+                    comment_preview }}"</p>
+            </div>
+
+            <p>Reviews help build your reputation on TalentLink. Keep up the great work!</p>
+
+            <a href="#" class="button">View Full Review</a>
+        </div>
+        <div class="footer">
+            <p>Best regards,<br>The TalentLink Team</p>
+            <p>This is an automated message. Please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+
+</html>

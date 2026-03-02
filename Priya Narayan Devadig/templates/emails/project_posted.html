@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>New Project Opportunity</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: #4f46e5;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 20px;
+            background: #f9f9f9;
+        }
+
+        .project-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #4f46e5;
+        }
+
+        .button {
+            display: inline-block;
+            background: #4f46e5;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .budget {
+            color: #10b981;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .skills {
+            background: #e5e7eb;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .skill-tag {
+            display: inline-block;
+            background: #4f46e5;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 New Project Opportunity!</h1>
+        </div>
+
+        <div class="content">
+            <p>Hello {{ freelancer.get_full_name }},</p>
+
+            <p>Great news! A new project that matches your skills has been posted on our platform.</p>
+
+            <div class="project-card">
+                <h2>{{ project.title }}</h2>
+
+                <p><strong>Posted by:</strong> {{ client.get_full_name }}</p>
+
+                <p><strong>Budget:</strong> <span class="budget">${{ project.budget_min }} - ${{ project.budget_max
+                        }}</span></p>
+
+                <p><strong>Duration:</strong> {{ project.estimated_duration }} days</p>
+
+                <p><strong>Deadline:</strong> {{ project.deadline|date:"F d, Y" }}</p>
+
+                <p><strong>Description:</strong></p>
+                <p>{{ project.description|truncatewords:50 }}</p>
+
+                {% if project.required_skills.all %}
+                <div class="skills">
+                    <strong>Required Skills:</strong><br>
+                    {% for skill in project.required_skills.all %}
+                    <span class="skill-tag">{{ skill.name }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <p>This looks like a perfect match for your expertise! Don't miss out on this opportunity.</p>
+
+            <div style="text-align: center;">
+                <a href="http://127.0.0.1:3000/projects/{{ project.id }}" class="button">View Project Details</a>
+            </div>
+
+            <p><strong>Why this project is great for you:</strong></p>
+            <ul>
+                <li>✅ Matches your skill set</li>
+                <li>💰 Competitive budget range</li>
+                <li>⏰ Clear timeline and expectations</li>
+                <li>🤝 Opportunity to work with {{ client.get_full_name }}</li>
+            </ul>
+
+            <p><em>Tip: Submit your proposal early to increase your chances of being selected!</em></p>
+        </div>
+
+        <div class="footer">
+            <p>Best regards,<br>The TalentLink Team</p>
+            <p>This is an automated message. Please do not reply to this email.</p>
+            <p>If you no longer wish to receive project notifications, you can update your preferences in your account
+                settings.</p>
+        </div>
+    </div>
+</body>
+
+</html>

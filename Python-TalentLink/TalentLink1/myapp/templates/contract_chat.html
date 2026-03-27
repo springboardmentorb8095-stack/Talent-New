@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Contract Chat</title>
+
+<style>
+body { font-family: Arial; background:#f0f2f5; }
+.chat-container { width:800px; margin:40px auto; background:#fff; padding:20px; border-radius:8px; }
+.messages { height:400px; overflow-y:auto; border:1px solid #ddd; padding:10px; }
+.message { margin-bottom:10px; }
+.sender { font-weight:bold; }
+.clear { background:#dc3545; }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+
+<div class="chat-container">
+    <h2>Chat – Contract #{{ contract.id }}</h2>
+
+    <div class="messages" id="messages">
+        {% for msg in messages %}
+            <div class="message">
+                <span class="sender">{{ msg.sender.user.username }}:</span>
+                {{ msg.content }}
+
+                {% if msg.file %}
+                    <br>
+                    <a href="{{ msg.file.url }}" download>Download file</a>
+                {% endif %}
+
+                <span style="float:right;font-size:10px;color:#999;">
+                    {{ msg.timestamp|date:"H:i" }}
+                </span>
+            </div>
+        {% empty %}
+            <p>No messages yet.</p>
+        {% endfor %}
+    </div>
+
+    <br>
+
+    {% csrf_token %}
+    <input type="text" id="messageText" placeholder="Type message">
+    <input type="file" id="fileInput">
+    <button id="sendBtn">Send</button>
+    <button id="clearBtn" class="clear">Clear Chat</button>
+</div>
+
+<script>
+function scrollBottom() {
+    let box = document.getElementById("messages");
+    box.scrollTop = box.scrollHeight;
+}
+scrollBottom();
+
+$("#sendBtn").click(function () {
+    let text = $("#messageText").val();
+    let file = $("#fileInput")[0].files[0];
+
+    if (!text && !file) return;
+
+    let formData = new FormData();
+    formData.append("contract_id", "{{ contract.id }}");
+    formData.append("content", text);
+    if (file) formData.append("file", file);
+    formData.append(
+        "csrfmiddlewaretoken",
+        document.querySelector("[name=csrfmiddlewaretoken]").value
+    );
+
+    $.ajax({
+        url: "{% url 'send_message' %}",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function () {
+            location.reload(); // SIMPLE & SAFE
+        }
+    });
+});
+
+$("#clearBtn").click(function () {
+    if (!confirm("Clear chat?")) return;
+
+    $.post("{% url 'clear_chat' contract.id %}", {
+        csrfmiddlewaretoken:
+            document.querySelector("[name=csrfmiddlewaretoken]").value
+    }, function () {
+        location.reload();
+    });
+});
+</script>
+
+</body>
+</html>

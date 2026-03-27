@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your App</title>
+</head>
+<body>
+
+<!-- 🔔 NOTIFICATION CONTAINER -->
+<div id="notificationBox"
+     style="position:fixed; top:60px; right:20px; width:300px; background:#fff; box-shadow:0 0 10px rgba(0,0,0,0.2); z-index:999;">
+</div>
+
+{% block content %}{% endblock %}
+
+<!-- 🔥 WRITE SCRIPT AT VERY END -->
+<script>
+function loadNotifications() {
+    fetch("{% url 'get_notifications' %}")
+        .then(res => res.json())
+        .then(data => {
+            let box = document.getElementById("notificationBox");
+            if (!box) return;
+
+            box.innerHTML = "";
+
+            data.notifications.forEach(n => {
+                let div = document.createElement("div");
+                div.innerHTML = n.message;
+                div.style.cursor = "pointer";
+                div.style.padding = "10px";
+                div.style.borderBottom = "1px solid #ddd";
+
+                div.onclick = function () {
+                    fetch(`/notifications/read/${n.id}/`)
+                        .then(() => div.remove());
+                };
+
+                box.appendChild(div);
+            });
+        });
+}
+
+setInterval(loadNotifications, 3000);
+loadNotifications();
+</script>
+
+</body>
+</html>

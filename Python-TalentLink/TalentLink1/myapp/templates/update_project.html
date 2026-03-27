@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Project</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f1117, #1e293b);
+            font-family: "Segoe UI", sans-serif;
+            color: #e5e7eb;
+            margin: 0;
+            padding: 0 20px;
+        }
+        h1, h2, h3 {
+            color: #facc15;
+        }
+        .form-box {
+            background: #1e293b;
+            padding: 20px;
+            margin-top: 10px;
+            border-radius: 10px;
+        }
+        input, textarea, button, select {
+            width: 100%;
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+            background: #334155;
+            color: #f1f5f9;
+        }
+        button {
+            background: #f59e0b;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #d97706;
+        }
+        .proposal-status {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        /* TOP BUTTONS */
+        .top-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .top-buttons a {
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            background: #38bdf8;
+            color: #020617;
+        }
+        .top-buttons a.logout {
+            background: #ef4444;
+            color: #ffffff;
+        }
+        .top-buttons a:hover {
+            opacity: 0.85;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ADDED BUTTONS -->
+    <div class="top-buttons">
+        <a href="{% url 'client_dashboard' %}">⬅ Return to Client Dashboard</a>
+        <a href="{% url 'logout' %}" class="logout">🚪 Logout</a>
+    </div>
+
+    <h1>Update Project: {{ form.instance.title }}</h1>
+
+    <!-- Project Update Form -->
+    <div class="form-box">
+        <form method="post" action="">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Update Project</button>
+        </form>
+    </div>
+
+    <hr style="margin: 20px 0; border: 1px solid #334155;">
+
+    <!-- Freelancer Submit Proposal Section -->
+    {% if user.is_authenticated and user.profile.role == "freelancer" %}
+        {% if user_proposal %}
+            <div class="proposal-status">
+                {% if user_proposal.status == "PENDING" %}
+                    <p>⏳ Your proposal is pending.</p>
+                {% elif user_proposal.status == "ACCEPTED" %}
+                    <p style="color:#22c55e;">🎉 Proposal accepted by client!</p>
+                {% elif user_proposal.status == "REJECTED" %}
+                    <p style="color:#ef4444;">❌ Proposal rejected by client.</p>
+                {% endif %}
+            </div>
+        {% else %}
+            <h3>Submit Your Proposal</h3>
+            <div class="form-box">
+                <form method="post" action="{% url 'submit_proposal' form.instance.pk %}">
+                    {% csrf_token %}
+                    <textarea name="cover_letter" placeholder="Cover Letter" required></textarea>
+                    <input type="number" name="bid_amount" placeholder="Bid Amount" required>
+                    <button type="submit">Submit Proposal</button>
+                </form>
+            </div>
+        {% endif %}
+    {% endif %}
+</body>
+</html>

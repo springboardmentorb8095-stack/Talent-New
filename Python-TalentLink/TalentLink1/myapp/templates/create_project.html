@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Project</title>
+    <style>
+        body {
+            background: linear-gradient(135deg,#0f1117,#1e293b);
+            font-family: "Segoe UI", sans-serif;
+            color: #e5e7eb;
+            padding: 40px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #22c55e;
+            margin-bottom: 25px;
+        }
+
+        .form-container {
+            max-width: 650px;
+            margin: auto;
+            background: #0f172a;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            color: #c7d2fe;
+            margin-bottom: 6px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-size: 14px;
+        }
+
+        textarea { resize: vertical; }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            background: #22c55e;
+            color: #020617;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        button:hover { background: #16a34a; }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #4ecdc4;
+            font-weight: bold;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Create Project</h2>
+
+<div class="form-container">
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label>Project Title</label>
+            {{ form.title }}
+        </div>
+
+        <div class="form-group">
+            <label>Description</label>
+            {{ form.description }}
+        </div>
+
+        <div class="form-group">
+            <label>Budget</label>
+            {{ form.budget }}
+        </div>
+
+        <div class="form-group">
+            <label>Deadline</label>
+            {{ form.deadline }}
+        </div>
+
+        <div class="form-group">
+            <label>Duration (days)</label>
+            {{ form.duration }}
+        </div>
+
+        <!-- ✍️ SKILLS INPUT -->
+        <div class="form-group">
+            <label>Skills Required</label>
+            {{ form.skills_text }}
+            <small style="color:#94a3b8;">
+                Example: Python, Django, React
+            </small>
+        </div>
+
+        <button type="submit">Create Project</button>
+    </form>
+
+    <a href="{% url 'client_dashboard' %}">← Back to Dashboard</a>
+</div>
+
+</body>
+</html>
